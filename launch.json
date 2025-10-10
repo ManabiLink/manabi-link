@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (open web index)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "openWebHtml",
+      "env": {
+        "NO_PROXY": "localhost,127.0.0.1",
+        "no_proxy": "localhost,127.0.0.1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "openWebHtml",
+      "type": "shell",
+      "command": "xdg-open",
+      "args": ["${workspaceFolder}/web/index.html"],
+      "presentation": {
+        "reveal": "never"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
+}

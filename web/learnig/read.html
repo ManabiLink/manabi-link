@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>読み聞かせページ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro', 'Yu Gothic', '游ゴシック', 'Meiryo', 'メイリオ', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .story-selector {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #764ba2;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .play-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .play-btn:hover {
+            background: #45a049;
+        }
+
+        .pause-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .pause-btn:hover {
+            background: #e68900;
+        }
+
+        .stop-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background: #da190b;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .speed-control label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .speed-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .story-content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 15px;
+            line-height: 2;
+            font-size: 20px;
+            min-height: 300px;
+        }
+
+        .story-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sentence {
+            display: inline;
+        }
+
+        .sentence.reading {
+            background: linear-gradient(transparent 60%, #ffeb3b 60%);
+            font-weight: bold;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 読み聞かせページ 📖</h1>
+        
+        <div class="story-selector">
+            <select id="storySelect">
+                <option value="momotaro">桃太郎</option>
+                <option value="kintaro">金太郎</option>
+                <option value="kaguyahime">かぐや姫</option>
+                <option value="urashima">浦島太郎</option>
+            </select>
+        </div>
+
+        <div class="controls">
+            <button class="play-btn" onclick="playStory()">▶ 再生</button>
+            <button class="pause-btn" onclick="pauseStory()">⏸ 一時停止</button>
+            <button class="stop-btn" onclick="stopStory()">⏹ 停止</button>
+        </div>
+
+        <div class="speed-control">
+            <label>速度:</label>
+            <input type="range" id="speedRange" min="0.5" max="2" step="0.1" value="1">
+            <span class="speed-value" id="speedValue">1.0x</span>
+        </div>
+
+        <div class="story-content" id="storyContent"></div>
+
+        <div class="status" id="status">物語を選んで再生ボタンを押してください</div>
+    </div>
+
+    <script>
+        const stories = {
+            momotaro: {
+                title: "桃太郎",
+                text: "むかしむかし、あるところに、おじいさんとおばあさんが住んでいました。おじいさんは山へしばかりに、おばあさんは川へせんたくに行きました。おばあさんが川でせんたくをしていると、ドンブラコ、ドンブラコと、大きな桃が流れてきました。おばあさんは桃を家に持ち帰り、おじいさんと二人で桃を切ってみると、中から元気な男の子が生まれました。二人は男の子を桃太郎と名付けて、大切に育てました。桃太郎はすくすくと育ち、とても強い子になりました。ある日、桃太郎は鬼が島の鬼を退治しに行くことを決心しました。おばあさんが作ってくれたきびだんごを持って、桃太郎は旅に出ました。途中で、犬と猿とキジに出会い、きびだんごをあげて仲間にしました。四人は力を合わせて鬼が島に着き、鬼と戦いました。桃太郎たちは見事に鬼を退治し、鬼が盗んだ宝物を取り返しました。そして、みんなで村に帰り、おじいさんとおばあさんと幸せに暮らしましたとさ。めでたし、めでたし。"
+            },
+            kintaro: {
+                title: "金太郎",
+                text: "むかしむかし、足柄山に金太郎という男の子が住んでいました。金太郎はとても力持ちで、まさかりをかついで山の中を駆け回っていました。金太郎は動物たちと仲良しで、クマやウサギやサルたちと一緒に遊んでいました。ある日、金太郎は動物たちと相撲をとって遊びました。金太郎はクマにも負けない強さでした。山の動物たちはみんな、金太郎が大好きでした。ある日、都から偉い侍が山にやってきました。侍は金太郎の強さを見て、とても驚きました。侍は金太郎を都に連れて行き、立派な武士に育てることにしました。金太郎は坂田金時という名前をもらい、源頼光という大将の家来になりました。金太郎は都でも活躍し、とても強い武士になりました。そして、鬼退治でも大活躍したそうです。めでたし、めでたし。"
+            },
+            kaguyahime: {
+                title: "かぐや姫",
+                text: "むかしむかし、竹取りのおじいさんが山で竹を切っていると、光る竹を見つけました。竹を切ってみると、中に小さな女の子がいました。おじいさんとおばあさんは女の子をかぐや姫と名付けて、大切に育てました。かぐや姫はすくすくと育ち、とても美しい女性になりました。その後、竹の中から金や宝石が出てくるようになり、おじいさんの家は大金持ちになりました。かぐや姫の美しさの噂は広まり、たくさんの人が結婚を申し込みにきました。しかし、かぐや姫は誰とも結婚しませんでした。ある日、かぐや姫は悲しそうに月を見上げて言いました。私は月の都の人間です。もうすぐ月に帰らなければなりません。おじいさんとおばあさんは悲しみましたが、止めることはできませんでした。十五夜の夜、月から迎えが来て、かぐや姫は月へ帰っていきました。おじいさんとおばあさんは、とても悲しみましたとさ。"
+            },
+            urashima: {
+                title: "浦島太郎",
+                text: "むかしむかし、浦島太郎という漁師の若者がいました。ある日、太郎が浜辺を歩いていると、子供たちがカメをいじめているのを見つけました。太郎はカメを助けてあげました。数日後、太郎が漁に出ると、カメが現れて言いました。先日は助けていただき、ありがとうございました。お礼に竜宮城へご案内します。太郎はカメの背中に乗って、海の中の竜宮城へ行きました。竜宮城では乙姫様が太郎を歓迎し、美しい魚たちの踊りでもてなしました。太郎は楽しい時間を過ごしましたが、やがて家が心配になり、帰ることにしました。乙姫様は玉手箱を渡して言いました。困ったときに開けてください。でも、それまでは決して開けてはいけません。太郎は村に帰りましたが、村の様子が全く変わっていました。竜宮城で過ごした数日は、地上では何百年も経っていたのです。悲しくなった太郎は、つい玉手箱を開けてしまいました。すると、中から白い煙が出て、太郎はあっという間におじいさんになってしまいましたとさ。"
+            }
+        };
+
+        let currentSentences = [];
+        let currentIndex = 0;
+        let utterance = null;
+        let isPaused = false;
+        let isReading = false;
+
+        const storySelect = document.getElementById('storySelect');
+        const storyContent = document.getElementById('storyContent');
+        const status = document.getElementById('status');
+        const speedRange = document.getElementById('speedRange');
+        const speedValue = document.getElementById('speedValue');
+
+        speedRange.addEventListener('input', function() {
+            speedValue.textContent = this.value + 'x';
+            if (utterance && isReading) {
+                utterance.rate = parseFloat(this.value);
+            }
+        });
+
+        storySelect.addEventListener('change', loadStory);
+
+        function loadStory() {
+            const selectedStory = stories[storySelect.value];
+            const sentences = selectedStory.text.match(/[^。]+。/g) || [selectedStory.text];
+            
+            currentSentences = sentences;
+            currentIndex = 0;
+            
+            let html = `<div class="story-title">${selectedStory.title}</div>`;
+            sentences.forEach((sentence, index) => {
+                html += `<span class="sentence" data-index="${index}">${sentence}</span>`;
+            });
+            
+            storyContent.innerHTML = html;
+            status.textContent = '物語を選んで再生ボタンを押してください';
+        }
+
+        function playStory() {
+            if (!currentSentences.length) {
+                loadStory();
+            }
+
+            if (isPaused) {
+                window.speechSynthesis.resume();
+                isPaused = false;
+                status.textContent = '読み聞かせ中...';
+                return;
+            }
+
+            if (isReading) {
+                return;
+            }
+
+            isReading = true;
+            status.textContent = '読み聞かせ中...';
+            readNextSentence();
+        }
+
+        function readNextSentence() {
+            if (currentIndex >= currentSentences.length) {
+                stopStory();
+                status.textContent = '読み聞かせが終わりました！';
+                return;
+            }
+
+            const sentenceElements = document.querySelectorAll('.sentence');
+            sentenceElements.forEach(el => el.classList.remove('reading'));
+            
+            const currentElement = document.querySelector(`[data-index="${currentIndex}"]`);
+            if (currentElement) {
+                currentElement.classList.add('reading');
+                currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            utterance = new SpeechSynthesisUtterance(currentSentences[currentIndex]);
+            utterance.lang = 'ja-JP';
+            utterance.rate = parseFloat(speedRange.value);
+            utterance.pitch = 1.1;
+            
+            utterance.onend = function() {
+                currentIndex++;
+                if (!isPaused) {
+                    readNextSentence();
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function pauseStory() {
+            if (isReading && !isPaused) {
+                window.speechSynthesis.pause();
+                isPaused = true;
+                status.textContent = '一時停止中';
+            }
+        }
+
+        function stopStory() {
+            window.speechSynthesis.cancel();
+            isReading = false;
+            isPaused = false;
+            currentIndex = 0;
+            
+            const sentenceElements = document.querySelectorAll('.sentence');
+            sentenceElements.forEach(el => el.classList.remove('reading'));
+            
+            status.textContent = '停止しました';
+        }
+
+        loadStory();
+    </script>
+</body>
+</html>

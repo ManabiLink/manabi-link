@@ -1,318 +1,401 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ピンクカレンダー 💖 ＆ お薬手帳 💊 + 通知機能</title>
-<style>
-  body {
-    font-family: "Helvetica", sans-serif;
-    background: linear-gradient(180deg, #fff0f6 0%, #fffdfd 100%);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  h1 {
-    color: #ff69b4;
-    margin: 20px;
-  }
-  .mode-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  .mode-buttons button {
-    background-color: #ff69b4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 15px;
-    cursor: pointer;
-  }
-  .mode-buttons button.active {
-    background-color: #ff85c1;
-  }
-  .calendar {
-    width: 90%;
-    max-width: 900px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 0 12px rgba(255,105,180,0.3);
-    padding: 20px;
-    margin-bottom: 30px;
-  }
-  .calendar-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  select {
-    border: 1px solid #ffb6c1;
-    border-radius: 6px;
-    padding: 5px 10px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th {
-    color: #ff69b4;
-    padding: 8px 0;
-  }
-  td {
-    width: 14.2%;
-    height: 100px;
-    border: 1px solid #ffd6e7;
-    vertical-align: top;
-    text-align: left;
-    padding: 5px;
-    background-color: white;
-    cursor: pointer;
-    position: relative;
-  }
-  td.holiday {
-    background-color: #fff0f3;
-    color: #ff3366;
-  }
-  .event {
-    background-color: #ffb6c1;
-    border-radius: 8px;
-    padding: 2px 5px;
-    margin-top: 3px;
-    font-size: 0.8em;
-    color: white;
-  }
-  #editor {
-    margin-top: 20px;
-    width: 90%;
-    max-width: 900px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 0 12px rgba(255,105,180,0.3);
-    padding: 20px;
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-  }
-  textarea {
-    height: 80px;
-  }
-  #saveBtn, #deleteBtn {
-    background-color: #ff69b4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 15px;
-    cursor: pointer;
-  }
-  #deleteBtn {
-    background-color: #ccc;
-    color: #333;
-  }
-  input[type="datetime-local"] {
-    border: 1px solid #ffd6e7;
-    border-radius: 6px;
-    padding: 5px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ピンクカレンダー 💖 ＆ お薬手帳 💊 + 通知機能</title>
+    <style>
+        body {
+            font-family: "Helvetica", sans-serif;
+            background: linear-gradient(180deg, #fff0f6 0%, #fffdfd 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #ff69b4;
+            margin: 20px;
+        }
+
+        /* Header area: 左に戻るボタン、右にモード切替ボタンを配置 */
+        .justify-content {
+            width: 90%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .pre {
+            display: flex;
+            align-items: center;
+        }
+
+        .pre button {
+            background: transparent;
+            border: 1px solid #ffd6e7;
+            color: #ff4d7a;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(255,105,180,0.12);
+            font-weight: 600;
+        }
+
+        .pre button:hover {
+            background: #fff0f6;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-buttons button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255,105,180,0.12);
+            transition: background-color 160ms ease, transform 120ms ease;
+        }
+
+        .mode-buttons button:hover {
+            transform: translateY(-2px);
+        }
+
+        .mode-buttons button.active {
+            background-color: #ff85c1;
+        }
+
+        .calendar {
+            width: 90%;
+            max-width: 900px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 0 12px rgba(255, 105, 180, 0.3);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        select {
+            border: 1px solid #ffb6c1;
+            border-radius: 6px;
+            padding: 5px 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #ff69b4;
+            padding: 8px 0;
+        }
+
+        td {
+            width: 14.2%;
+            height: 100px;
+            border: 1px solid #ffd6e7;
+            vertical-align: top;
+            text-align: left;
+            padding: 5px;
+            background-color: white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        td.holiday {
+            background-color: #fff0f3;
+            color: #ff3366;
+        }
+
+        .event {
+            background-color: #ffb6c1;
+            border-radius: 8px;
+            padding: 2px 5px;
+            margin-top: 3px;
+            font-size: 0.8em;
+            color: white;
+        }
+
+        #editor {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 900px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 0 12px rgba(255, 105, 180, 0.3);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        #saveBtn,
+        #deleteBtn {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        #deleteBtn {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        input[type="datetime-local"] {
+            border: 1px solid #ffd6e7;
+            border-radius: 6px;
+            padding: 5px;
+        }
+    </style>
 </head>
+
 <body>
-<h1>ピンクカレンダー 💖</h1>
+    <h1>ピンクカレンダー 💖</h1>
 
-<div class="mode-buttons">
-  <button id="normalBtn" class="active">📅 通常カレンダー</button>
-  <button id="medBtn">💊 お薬手帳</button>
-</div>
+    <div class="justify-content">
 
-<div class="calendar">
-  <div class="calendar-header">
-    <select id="year"></select>
-    <select id="month"></select>
-  </div>
-  <table id="calendarTable">
-    <thead>
-      <tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
-    </thead>
-    <tbody id="calendarBody"></tbody>
-  </table>
-</div>
+        <div class="pre">
+            <button id="pre" type="button">
+                戻る
+            </button>
+        </div>
 
-<div id="editor">
-  <h3 id="selectedDate"></h3>
-  <input type="text" id="titleInput" placeholder="タイトル">
-  <textarea id="bodyInput" placeholder="内容"></textarea>
-  <label>通知日時：</label>
-  <input type="datetime-local" id="notifyInput">
-  <div style="display:flex; gap:10px;">
-    <button id="saveBtn">保存</button>
-    <button id="deleteBtn">削除</button>
-  </div>
-</div>
+        <div class="mode-buttons">
+            <button id="normalBtn" class="active">📅 通常カレンダー</button>
+            <button id="medBtn">💊 お薬手帳</button>
+        </div>
 
-<script>
-const HOLIDAYS = {
-  "2025-01-01": "元日", "2025-01-13": "成人の日", "2025-02-11": "建国記念の日",
-  "2025-02-23": "天皇誕生日", "2025-03-20": "春分の日", "2025-04-29": "昭和の日",
-  "2025-05-03": "憲法記念日", "2025-05-04": "みどりの日", "2025-05-05": "こどもの日",
-  "2025-07-21": "海の日", "2025-08-11": "山の日", "2025-09-15": "敬老の日",
-  "2025-09-23": "秋分の日", "2025-10-13": "スポーツの日", "2025-11-03": "文化の日",
-  "2025-11-23": "勤労感謝の日"
-};
+    </div>
 
-let events = JSON.parse(localStorage.getItem("events") || "{}");
-let meds = JSON.parse(localStorage.getItem("meds") || "{}");
-let selectedDate = null;
-let currentMode = "normal";
+    <div class="calendar">
+        <div class="calendar-header">
+            <select id="year"></select>
+            <select id="month"></select>
+        </div>
+        <table id="calendarTable">
+            <thead>
+                <tr>
+                    <th>日</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                    <th>土</th>
+                </tr>
+            </thead>
+            <tbody id="calendarBody"></tbody>
+        </table>
+    </div>
 
-const calendarBody = document.getElementById("calendarBody");
-const yearSelect = document.getElementById("year");
-const monthSelect = document.getElementById("month");
-const editor = document.getElementById("editor");
-const saveBtn = document.getElementById("saveBtn");
-const deleteBtn = document.getElementById("deleteBtn");
-const normalBtn = document.getElementById("normalBtn");
-const medBtn = document.getElementById("medBtn");
-const notifyInput = document.getElementById("notifyInput");
+    <div id="editor">
+        <h3 id="selectedDate"></h3>
+        <input type="text" id="titleInput" placeholder="タイトル">
+        <textarea id="bodyInput" placeholder="内容"></textarea>
+        <label>通知日時：</label>
+        <input type="datetime-local" id="notifyInput">
+        <div style="display:flex; gap:10px;">
+            <button id="saveBtn">保存</button>
+            <button id="deleteBtn">削除</button>
+        </div>
+    </div>
 
-function setupSelectors() {
-  const now = new Date();
-  for (let y = 2020; y <= 2030; y++) {
-    const opt = document.createElement("option");
-    opt.value = y;
-    opt.text = y;
-    yearSelect.appendChild(opt);
-  }
-  for (let m = 1; m <= 12; m++) {
-    const opt = document.createElement("option");
-    opt.value = m;
-    opt.text = m;
-    monthSelect.appendChild(opt);
-  }
-  yearSelect.value = now.getFullYear();
-  monthSelect.value = now.getMonth() + 1;
-}
-setupSelectors();
+    <script>
+        const HOLIDAYS = {
+            "2025-01-01": "元日", "2025-01-13": "成人の日", "2025-02-11": "建国記念の日",
+            "2025-02-23": "天皇誕生日", "2025-03-20": "春分の日", "2025-04-29": "昭和の日",
+            "2025-05-03": "憲法記念日", "2025-05-04": "みどりの日", "2025-05-05": "こどもの日",
+            "2025-07-21": "海の日", "2025-08-11": "山の日", "2025-09-15": "敬老の日",
+            "2025-09-23": "秋分の日", "2025-10-13": "スポーツの日", "2025-11-03": "文化の日",
+            "2025-11-23": "勤労感謝の日"
+        };
 
-function renderCalendar() {
-  const year = +yearSelect.value;
-  const month = +monthSelect.value;
-  calendarBody.innerHTML = "";
+        let events = JSON.parse(localStorage.getItem("events") || "{}");
+        let meds = JSON.parse(localStorage.getItem("meds") || "{}");
+        let selectedDate = null;
+        let currentMode = "normal";
 
-  const firstDay = new Date(year, month - 1, 1).getDay();
-  const daysInMonth = new Date(year, month, 0).getDate();
-  let row = document.createElement("tr");
+        const calendarBody = document.getElementById("calendarBody");
+        const yearSelect = document.getElementById("year");
+        const monthSelect = document.getElementById("month");
+        const editor = document.getElementById("editor");
+        const saveBtn = document.getElementById("saveBtn");
+        const deleteBtn = document.getElementById("deleteBtn");
+        const normalBtn = document.getElementById("normalBtn");
+        const medBtn = document.getElementById("medBtn");
+        const notifyInput = document.getElementById("notifyInput");
+        // 戻るボタン：ルートの ../index.html へ遷移
+        const preBtn = document.getElementById("pre");
+        if (preBtn) {
+            preBtn.addEventListener("click", () => {
+                // ルートの ../index.html に遷移（ホスティング環境に合わせて調整してください）
+                window.location.href = "/web/index.html";
+            });
+        }
 
-  for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
+        function setupSelectors() {
+            const now = new Date();
+            for (let y = 2020; y <= 2030; y++) {
+                const opt = document.createElement("option");
+                opt.value = y;
+                opt.text = y;
+                yearSelect.appendChild(opt);
+            }
+            for (let m = 1; m <= 12; m++) {
+                const opt = document.createElement("option");
+                opt.value = m;
+                opt.text = m;
+                monthSelect.appendChild(opt);
+            }
+            yearSelect.value = now.getFullYear();
+            monthSelect.value = now.getMonth() + 1;
+        }
+        setupSelectors();
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const cell = document.createElement("td");
-    const ymd = `${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-    cell.dataset.date = ymd;
+        function renderCalendar() {
+            const year = +yearSelect.value;
+            const month = +monthSelect.value;
+            calendarBody.innerHTML = "";
 
-    if (currentMode === "normal" && HOLIDAYS[ymd]) {
-      cell.classList.add("holiday");
-      cell.innerHTML = `<strong>${day}</strong><br><small>${HOLIDAYS[ymd]}</small>`;
-    } else {
-      cell.textContent = day;
-    }
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const daysInMonth = new Date(year, month, 0).getDate();
+            let row = document.createElement("tr");
 
-    const dataSet = currentMode === "normal" ? events : meds;
-    if (dataSet[ymd]) {
-      const ev = document.createElement("div");
-      ev.className = "event";
-      ev.textContent = dataSet[ymd].title;
-      cell.appendChild(ev);
-    }
+            for (let i = 0; i < firstDay; i++) row.appendChild(document.createElement("td"));
 
-    cell.addEventListener("click", openEditor);
-    row.appendChild(cell);
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement("td");
+                const ymd = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                cell.dataset.date = ymd;
 
-    if ((firstDay + day) % 7 === 0 || day === daysInMonth) {
-      calendarBody.appendChild(row);
-      row = document.createElement("tr");
-    }
-  }
-}
-renderCalendar();
-yearSelect.onchange = monthSelect.onchange = renderCalendar;
+                if (currentMode === "normal" && HOLIDAYS[ymd]) {
+                    cell.classList.add("holiday");
+                    cell.innerHTML = `<strong>${day}</strong><br><small>${HOLIDAYS[ymd]}</small>`;
+                } else {
+                    cell.textContent = day;
+                }
 
-function openEditor(e) {
-  selectedDate = e.currentTarget.dataset.date;
-  if (!selectedDate) return;
-  editor.style.display = "flex";
-  document.getElementById("selectedDate").textContent = selectedDate;
-  const dataSet = currentMode === "normal" ? events : meds;
-  const data = dataSet[selectedDate] || {};
-  document.getElementById("titleInput").value = data.title || "";
-  document.getElementById("bodyInput").value = data.body || "";
-  notifyInput.value = data.notify || "";
-  notifyInput.min = new Date().toISOString().slice(0,16);
-}
+                const dataSet = currentMode === "normal" ? events : meds;
+                if (dataSet[ymd]) {
+                    const ev = document.createElement("div");
+                    ev.className = "event";
+                    ev.textContent = dataSet[ymd].title;
+                    cell.appendChild(ev);
+                }
 
-saveBtn.onclick = () => {
-  if (!selectedDate) return;
-  const title = document.getElementById("titleInput").value;
-  const body = document.getElementById("bodyInput").value;
-  const notify = notifyInput.value;
-  if (notify && notify < new Date().toISOString().slice(0,16)) {
-    alert("通知日時は現在以降に設定してください💖");
-    return;
-  }
-  const dataSet = currentMode === "normal" ? events : meds;
-  dataSet[selectedDate] = { title, body, notify };
-  localStorage.setItem(currentMode === "normal" ? "events" : "meds", JSON.stringify(dataSet));
-  renderCalendar();
-  editor.style.display = "none";
-};
+                cell.addEventListener("click", openEditor);
+                row.appendChild(cell);
 
-deleteBtn.onclick = () => {
-  if (!selectedDate) return;
-  const dataSet = currentMode === "normal" ? events : meds;
-  delete dataSet[selectedDate];
-  localStorage.setItem(currentMode === "normal" ? "events" : "meds", JSON.stringify(dataSet));
-  renderCalendar();
-  editor.style.display = "none";
-};
+                if ((firstDay + day) % 7 === 0 || day === daysInMonth) {
+                    calendarBody.appendChild(row);
+                    row = document.createElement("tr");
+                }
+            }
+        }
+        renderCalendar();
+        yearSelect.onchange = monthSelect.onchange = renderCalendar;
 
-normalBtn.onclick = () => {
-  currentMode = "normal";
-  normalBtn.classList.add("active");
-  medBtn.classList.remove("active");
-  renderCalendar();
-  editor.style.display = "none";
-};
+        function openEditor(e) {
+            selectedDate = e.currentTarget.dataset.date;
+            if (!selectedDate) return;
+            editor.style.display = "flex";
+            document.getElementById("selectedDate").textContent = selectedDate;
+            const dataSet = currentMode === "normal" ? events : meds;
+            const data = dataSet[selectedDate] || {};
+            document.getElementById("titleInput").value = data.title || "";
+            document.getElementById("bodyInput").value = data.body || "";
+            notifyInput.value = data.notify || "";
+            notifyInput.min = new Date().toISOString().slice(0, 16);
+        }
 
-medBtn.onclick = () => {
-  currentMode = "med";
-  medBtn.classList.add("active");
-  normalBtn.classList.remove("active");
-  renderCalendar();
-  editor.style.display = "none";
-};
+        saveBtn.onclick = () => {
+            if (!selectedDate) return;
+            const title = document.getElementById("titleInput").value;
+            const body = document.getElementById("bodyInput").value;
+            const notify = notifyInput.value;
+            if (notify && notify < new Date().toISOString().slice(0, 16)) {
+                alert("通知日時は現在以降に設定してください💖");
+                return;
+            }
+            const dataSet = currentMode === "normal" ? events : meds;
+            dataSet[selectedDate] = { title, body, notify };
+            localStorage.setItem(currentMode === "normal" ? "events" : "meds", JSON.stringify(dataSet));
+            renderCalendar();
+            editor.style.display = "none";
+        };
 
-if ("Notification" in window) {
-  Notification.requestPermission().then(p => {
-    if (p === "granted") console.log("通知が許可されました");
-  });
-}
+        deleteBtn.onclick = () => {
+            if (!selectedDate) return;
+            const dataSet = currentMode === "normal" ? events : meds;
+            delete dataSet[selectedDate];
+            localStorage.setItem(currentMode === "normal" ? "events" : "meds", JSON.stringify(dataSet));
+            renderCalendar();
+            editor.style.display = "none";
+        };
 
-setInterval(() => {
-  checkAndNotify(events);
-  checkAndNotify(meds);
-}, 60000);
+        normalBtn.onclick = () => {
+            currentMode = "normal";
+            normalBtn.classList.add("active");
+            medBtn.classList.remove("active");
+            renderCalendar();
+            editor.style.display = "none";
+        };
 
-function checkAndNotify(dataset) {
-  const now = new Date().toISOString().slice(0,16);
-  for (const [date, ev] of Object.entries(dataset)) {
-    if (ev.notify && ev.notify === now) {
-      new Notification(ev.title || "予定", { body: ev.body || "通知です💖" });
-    }
-  }
-}
-</script>
+        medBtn.onclick = () => {
+            currentMode = "med";
+            medBtn.classList.add("active");
+            normalBtn.classList.remove("active");
+            renderCalendar();
+            editor.style.display = "none";
+        };
+
+        if ("Notification" in window) {
+            Notification.requestPermission().then(p => {
+                if (p === "granted") console.log("通知が許可されました");
+            });
+        }
+
+        setInterval(() => {
+            checkAndNotify(events);
+            checkAndNotify(meds);
+        }, 60000);
+
+        function checkAndNotify(dataset) {
+            const now = new Date().toISOString().slice(0, 16);
+            for (const [date, ev] of Object.entries(dataset)) {
+                if (ev.notify && ev.notify === now) {
+                    new Notification(ev.title || "予定", { body: ev.body || "通知です💖" });
+                }
+            }
+        }
+    </script>
 </body>
+
 </html>

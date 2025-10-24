@@ -1,953 +1,205 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ManabiLink — 学びをつなぐ</title>
-  <style>
-    /* ==================== 基本設定 ==================== */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-      background-color: #ffe4e1;
-      font-size: 14px;
-    }
-
-    /* ==================== ヘッダー ==================== */
-    .site-header {
-      background-color: white;
-      border-bottom: 2px solid #ddd;
-      padding: 10px 0;
-    }
-    .site-header .container {
-      width: 90%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #333;
-    }
-    .nav a {
-      margin-left: 20px;
-      text-decoration: none;
-      color: #555;
-      font-weight: bold;
-    }
-    .nav a:hover { color: #007bff; }
-
-    /* ハンバーガーメニュー */
-    .hamburger {
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-      gap: 5px;
-    }
-    .hamburger span {
-      width: 25px;
-      height: 3px;
-      background-color: #333;
-    }
-    .menu-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      display: none;
-    }
-    .menu-backdrop.open { display: block; }
-    .menu-overlay {
-      position: fixed;
-      top: 0;
-      right: -350px;
-      width: 350px;
-      height: 100vh;
-      background-color: #f5e6f0;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-      transition: right 0.3s;
-      z-index: 1001;
-      padding: 40px 30px;
-    }
-    .menu-overlay.open { right: 0; }
-    .menu-close {
-      text-align: right;
-      font-size: 30px;
-      cursor: pointer;
-      margin-bottom: 30px;
-      color: #333;
-    }
-    .menu-items {
-      list-style: none;
-    }
-    .menu-items li {
-      padding: 20px 15px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      color: #333;
-      border-radius: 8px;
-      transition: 0.2s;
-    }
-    .menu-items li:hover { background-color: #e6d4e1; }
-
-    /* ==================== メインコンテンツ ==================== */
-    main {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 80vh;
-      padding: 20px;
-    }
-    .container-box {
-      background-color: white;
-      border: 5px solid #2b6be4;
-      border-radius: 10px;
-      padding: 50px;
-      text-align: center;
-      width: 90%;
-      max-width: 900px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-bottom: 30px;
-      font-size: 22px;
-    }
-
-    /* ==================== ホーム画面 ==================== */
-    .home h2 { margin-bottom: 40px; font-size: 24px; }
-    .button-area {
-      display: flex;
-      justify-content: center;
-      gap: 50px;
-      flex-wrap: wrap;
-    }
-    .home-btn {
-      width: 180px;
-      height: 110px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 30px;
-      font-size: 15px;
-      color: #222;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      transition: 0.3s;
-      text-decoration: none;
-    }
-    .home-btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-    }
-    .guardian-btn { background-color: #9aa0ff; }
-    .expert-btn { background-color: #a4e4b3; }
-
-    /* ==================== ログイン・登録画面 ==================== */
-    .login-container {
-      background-color: #fff0f6;
-      border: 5px solid #f5bcbc;
-      border-radius: 10px;
-      padding: 40px 60px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      max-width: 500px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-      text-align: left;
-    }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    input {
-      width: 100%;
-      max-width: 300px;
-      padding: 8px;
-      border: 1px solid #555;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    .btn {
-      margin-top: 20px;
-      padding: 8px 25px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      border: none;
-      transition: 0.2s;
-    }
-    .btn-login { background-color: #d3d3d3; }
-    .btn-login:hover { background-color: #bdbdbd; }
-    .btn-register { background-color: #9aa0ff; color: white; }
-    .btn-register:hover { background-color: #7f85ff; }
-    .link {
-      margin-top: 25px;
-      font-size: 16px;
-    }
-    .link a {
-      color: #0077aa;
-      font-weight: bold;
-      text-decoration: none;
-    }
-    .link a:hover { text-decoration: underline; }
-    .error-message {
-      color: #d32f2f;
-      background-color: #ffebee;
-      border: 1px solid #ef5350;
-      padding: 10px;
-      border-radius: 4px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    /* ==================== 保護者用ダッシュボード ==================== */
-    .dashboard {
-      text-align: left;
-      padding: 30px;
-      max-width: 1200px;
-    }
-    .dashboard h2 {
-      text-align: center;
-      color: #2b6be4;
-    }
-    .welcome-text {
-      font-size: 18px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    .dashboard-content {
-      display: flex;
-      justify-content: space-around;
-      gap: 20px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
-    .card {
-      background-color: white;
-      border: 3px solid #ddd;
-      border-radius: 15px;
-      padding: 30px 20px;
-      width: 250px;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .card-icon {
-      font-size: 50px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    .card h3 {
-      text-align: center;
-      font-size: 16px;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    .card-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .card-btn {
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .card-btn:hover { background-color: #e0e0e0; }
-    .logout-btn {
-      background-color: #ff6b6b;
-      color: white;
-      margin-top: 30px;
-    }
-    .logout-btn:hover { background-color: #ff5252; }
-
-    /* ==================== 専門家用ダッシュボード ==================== */
-    .expert-dashboard {
-      text-align: center;
-      padding: 50px;
-      max-width: 1000px;
-    }
-    .expert-dashboard h2 {
-      text-align: center;
-      color: #2b6be4;
-      margin-bottom: 60px;
-    }
-    .expert-dashboard-content {
-      display: flex;
-      justify-content: center;
-      gap: 50px;
-      margin-top: 50px;
-      flex-wrap: wrap;
-    }
-    .expert-card {
-      background-color: #a4e4b3;
-      border-radius: 40px;
-      padding: 60px 40px;
-      width: 280px;
-      height: 200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-    }
-    .expert-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-    }
-
-    /* ==================== 設定画面 ==================== */
-    .settings {
-      text-align: center;
-      padding: 50px;
-    }
-    .settings h2 {
-      margin-bottom: 40px;
-      font-size: 28px;
-      color: #333;
-    }
-    .settings-buttons {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-    }
-    .settings-btn {
-      width: 300px;
-      padding: 15px;
-      background-color: #d3d3d3;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .settings-btn:hover { background-color: #bdbdbd; }
-
-    /* 文字サイズ設定 */
-    .font-size-settings {
-      text-align: center;
-      padding: 50px;
-    }
-    .font-size-settings h2 {
-      margin-bottom: 60px;
-      font-size: 28px;
-      color: #333;
-    }
-    .font-size-options {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 30px;
-      margin-bottom: 50px;
-      flex-wrap: wrap;
-    }
-    .font-size-label {
-      font-size: 16px;
-      color: #666;
-    }
-    .font-size-buttons {
-      display: flex;
-      gap: 15px;
-    }
-    .font-btn {
-      padding: 10px 25px;
-      border: 2px solid #999;
-      background-color: #e8e8e8;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-    .font-btn:hover { background-color: #d8d8d8; }
-    .font-btn.active {
-      background-color: #9aa0ff;
-      border-color: #7f85ff;
-      color: white;
-    }
-    .font-btn.small { font-size: 12px; }
-    .font-btn.medium { font-size: 16px; }
-    .font-btn.large { font-size: 20px; }
-
-    /* パスワード・メールアドレス再設定 */
-    .password-reset, .email-reset {
-      text-align: center;
-      padding: 50px;
-    }
-    .password-reset h2, .email-reset h2 {
-      margin-bottom: 40px;
-      font-size: 28px;
-      color: #333;
-    }
-    .password-form, .email-form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-    }
-    .password-field, .email-field {
-      text-align: center;
-    }
-    .password-field label, .email-field label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    .password-field input, .email-field input {
-      width: 280px;
-      padding: 10px;
-      border: 1px solid #999;
-      border-radius: 4px;
-      font-size: 14px;
-      background-color: #e8e8e8;
-    }
-    .btn-password-submit, .btn-email-submit {
-      background-color: #d3d3d3;
-      padding: 12px 40px;
-      margin-top: 10px;
-    }
-    .btn-password-submit:hover, .btn-email-submit:hover {
-      background-color: #bdbdbd;
-    }
-
-    /* ==================== フォントサイズ制御 ==================== */
-    body.font-small { font-size: 12px; }
-    body.font-small h2 { font-size: 18px; }
-    body.font-small .logo { font-size: 1.1rem; }
-    body.font-small .home h2 { font-size: 20px; }
-    body.font-small .home-btn { font-size: 13px; }
-    
-    body.font-medium { font-size: 14px; }
-    body.font-medium h2 { font-size: 22px; }
-    body.font-medium .logo { font-size: 1.4rem; }
-    body.font-medium .home h2 { font-size: 24px; }
-    body.font-medium .home-btn { font-size: 15px; }
-    
-    body.font-large { font-size: 18px; }
-    body.font-large h2 { font-size: 32px; }
-    body.font-large .logo { font-size: 1.8rem; }
-    body.font-large .home h2 { font-size: 30px; }
-    body.font-large .home-btn { font-size: 18px; }
-    body.font-large .settings-btn,
-    body.font-large .card-btn,
-    body.font-large .btn { font-size: 18px; }
-
-    /* ==================== フッター ==================== */
-    .site-footer {
-      background-color: #f9f9f9;
-      text-align: center;
-      padding: 15px 0;
-      border-top: 1px solid #ddd;
-    }
-    .site-footer small { color: #555; }
-
-    /* ==================== ページ切替 ==================== */
-    .page { display: none; }
-    .page.active { display: block; }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ManabiLink — ボタンで操作</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="font-medium">
-  <!-- ==================== ヘッダー ==================== -->
-  <header class="site-header">
-    <div class="container">
-      <h1 class="logo">ManabiLink</h1>
-      <nav class="nav">
-        <a href="#features">特徴</a>
-        <a href="#about">サービスについて</a>
-        <a href="#contact">お問い合わせ</a>
-      </nav>
-      <div class="hamburger" onclick="toggleMenu()">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-  </header>
-
-  <!-- ==================== ハンバーガーメニュー ==================== -->
-  <div id="menuBackdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
-  <div id="menuOverlay" class="menu-overlay">
-    <div class="menu-close" onclick="toggleMenu()">×</div>
-    <ul class="menu-items">
-      <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
-      <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
-      <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
-      <li onclick="showPage('settings'); toggleMenu()">設定</li>
-      <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
-    </ul>
-  </div>
-
-  <main>
-    <!-- ==================== ホーム画面 ==================== -->
-    <div id="home" class="container-box home page active">
-      <h2>まなびリンクプロジェクト</h2>
-      <div class="button-area">
-        <a href="#" class="home-btn guardian-btn" onclick="showPage('login'); return false;">保護者の方はこちら</a>
-        <a href="#" class="home-btn expert-btn" onclick="showPage('expertLogin'); return false;">専門家の方はこちら</a>
-      </div>
-    </div>
-
-    <!-- ==================== 保護者用ログイン ==================== -->
-    <div id="login" class="login-container page">
-      <h2>まなびリンクプロジェクト</h2>
-      <div id="loginError" class="error-message" style="display: none;"></div>
-      <div class="form-group">
-        <label for="email">メールアドレス</label>
-        <input type="email" id="email">
-      </div>
-      <div class="form-group">
-        <label for="password">パスワード</label>
-        <input type="password" id="password">
-      </div>
-      <button class="btn btn-login" onclick="handleLogin()">ログイン</button>
-      <div class="link">
-        新規登録は <a href="#" onclick="showPage('register'); return false;">こちらから</a>
-      </div>
-      <div class="link">
-        <a href="#" onclick="showPage('home'); return false;">← ホームへ戻る</a>
-      </div>
-    </div>
-
-    <!-- ==================== 保護者用登録 ==================== -->
-    <div id="register" class="login-container page">
-      <h2>新規登録</h2>
-      <div id="registerError" class="error-message" style="display: none;"></div>
-      <div class="form-group">
-        <label for="name">お名前</label>
-        <input type="text" id="name">
-      </div>
-      <div class="form-group">
-        <label for="email2">メールアドレス</label>
-        <input type="email" id="email2">
-      </div>
-      <div class="form-group">
-        <label for="password2">パスワード</label>
-        <input type="password" id="password2">
-      </div>
-      <div class="form-group">
-        <label for="passwordConfirm">パスワード（確認）</label>
-        <input type="password" id="passwordConfirm">
-      </div>
-      <button class="btn btn-register" onclick="handleRegister()">登録する</button>
-      <div class="link">
-        <a href="#" onclick="showPage('login'); return false;">← ログイン画面に戻る</a>
-      </div>
-    </div>
-
-    <!-- ==================== 専門家用ログイン ==================== -->
-    <div id="expertLogin" class="login-container page">
-      <h2>まなびリンクプロジェクト（専門家）</h2>
-      <div id="expertLoginError" class="error-message" style="display: none;"></div>
-      <div class="form-group">
-        <label for="expertEmail">専門家用メールアドレス</label>
-        <input type="email" id="expertEmail">
-      </div>
-      <div class="form-group">
-        <label for="expertPassword">専門家用パスワード</label>
-        <input type="password" id="expertPassword">
-      </div>
-      <button class="btn btn-login" onclick="handleExpertLogin()">ログイン</button>
-      <div class="link">
-        新規登録は <a href="#" onclick="showPage('expertRegister'); return false;">こちらから</a>
-      </div>
-      <div class="link">
-        <a href="#" onclick="showPage('home'); return false;">← ホームへ戻る</a>
-      </div>
-    </div>
-
-    <!-- ==================== 専門家用登録 ==================== -->
-    <div id="expertRegister" class="login-container page">
-      <h2>新規登録（専門家）</h2>
-      <div id="expertRegisterError" class="error-message" style="display: none;"></div>
-      <div class="form-group">
-        <label for="expertName">お名前</label>
-        <input type="text" id="expertName">
-      </div>
-      <div class="form-group">
-        <label for="expertEmail2">専門家用メールアドレス</label>
-        <input type="email" id="expertEmail2">
-      </div>
-      <div class="form-group">
-        <label for="expertPassword2">専門家用パスワード</label>
-        <input type="password" id="expertPassword2">
-      </div>
-      <div class="form-group">
-        <label for="expertPasswordConfirm">専門家用パスワード（確認）</label>
-        <input type="password" id="expertPasswordConfirm">
-      </div>
-      <button class="btn btn-register" onclick="handleExpertRegister()">登録する</button>
-      <div class="link">
-        <a href="#" onclick="showPage('expertLogin'); return false;">← ログイン画面に戻る</a>
-      </div>
-    </div>
-
-    <!-- ==================== 保護者用ダッシュボード ==================== -->
-    <div id="dashboard" class="container-box dashboard page">
-      <h2>まなびリンクプロジェクト</h2>
-      <div class="welcome-text"><span id="userName"></span>さん、ようこそ!</div>
-      <div class="dashboard-content">
-        <div class="card" onclick="alert('保護者同士のコミュニケーション機能（準備中）')">
-          <div class="card-icon">👥</div>
-          <h3>保護者同士のコミュニケーション</h3>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo">ManabiLink</h1>
+            <nav class="nav">
+                <button onclick="alert('特徴ページへ遷移（準備中）')" style="margin-left: 0;">特徴</button>
+                <button onclick="alert('サービスについてページへ遷移（準備中）')">サービスについて</button>
+                <button onclick="alert('お問い合わせフォームへ遷移（準備中）')">お問い合わせ</button>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
         </div>
-        <div class="card">
-          <div class="card-icon">📰</div>
-          <h3>保護者の方にお勧めの記事</h3>
-          <div class="card-buttons">
-            <button class="card-btn" onclick="alert('記事1（準備中）')">記事</button>
-            <button class="card-btn" onclick="alert('記事2（準備中）')">記事</button>
-            <button class="card-btn" onclick="alert('記事3（準備中）')">記事</button>
-            <button class="card-btn" onclick="alert('記事4（準備中）')">記事</button>
-            <button class="card-btn" onclick="alert('記事5（準備中）')">記事</button>
-            <button class="card-btn" onclick="alert('記事6（準備中）')">記事</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-icon">💬</div>
-          <h3>専門家との話し合い</h3>
-          <div class="card-buttons">
-            <button class="card-btn" onclick="alert('就労について（準備中）')">就労について</button>
-            <button class="card-btn" onclick="alert('放課後等デイサービスについて（準備中）')">放課後等デイサービスについて</button>
-          </div>
-        </div>
-      </div>
-      <div style="text-align: center;">
-        <button class="btn logout-btn" onclick="handleLogout()">ログアウト</button>
-      </div>
+    </header>
+
+    <div id="menuBackdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
+    <div id="menuOverlay" class="menu-overlay">
+        <div class="menu-close" onclick="toggleMenu()">×</div>
+        <ul class="menu-items">
+            <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
+            <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
+            <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
+            <li onclick="showPage('settings'); toggleMenu()">設定</li>
+            <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
+        </ul>
     </div>
 
-    <!-- ==================== 専門家用ダッシュボード ==================== -->
-    <div id="expertDashboard" class="container-box expert-dashboard page">
-      <h2>まなびリンクプロジェクト（専門家）</h2>
-      <div class="expert-dashboard-content">
-        <div class="expert-card" onclick="alert('サイト投稿許可機能（準備中）')">
-          サイト投稿許可
+    <main>
+        <div id="home" class="container-box home page active">
+            <h2>まなびリンクプロジェクト</h2>
+            <div class="button-area">
+                <button class="home-btn guardian-btn" onclick="showPage('login');">保護者の方はこちら</button>
+                <button class="home-btn expert-btn" onclick="showPage('expertLogin');">専門家の方はこちら</button>
+            </div>
         </div>
-        <div class="expert-card" onclick="alert('カレンダー画面（準備中）')">
-          カレンダー画面
+
+        <div id="login" class="login-container page">
+            <h2>保護者ログイン</h2>
+            <div id="loginError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="email">メールアドレス</label><input type="email" id="email"></div>
+            <div class="form-group"><label for="password">パスワード</label><input type="password" id="password"></div>
+            <button class="btn btn-login" onclick="handleLogin()">ログイン</button>
+            <div class="link">
+                新規登録は <button class="link-btn" onclick="showPage('register');">こちらから</button>
+            </div>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('home');">← ホームへ戻る</button>
+            </div>
         </div>
-      </div>
-      <div style="text-align: center; margin-top: 50px;">
-        <button class="btn logout-btn" onclick="handleLogout()">ログアウト</button>
-      </div>
-    </div>
 
-    <!-- ==================== 設定画面 ==================== -->
-    <div id="settings" class="container-box settings page">
-      <h2>設定</h2>
-      <div class="settings-buttons">
-        <button class="settings-btn" onclick="alert('通知設定（準備中）')">通知設定</button>
-        <button class="settings-btn" onclick="showPage('fontSizeSettings')">文字の大きさ</button>
-        <button class="settings-btn" onclick="alert('アカウント管理（準備中）')">アカウント管理</button>
-        <button class="settings-btn" onclick="showPage('passwordReset')">パスワード再設定</button>
-        <button class="settings-btn" onclick="showPage('emailReset')">メールアドレス再設定</button>
-      </div>
-      <div style="margin-top: 30px;">
-        <button class="btn btn-login" onclick="showPage('dashboard')">← ダッシュボードに戻る</button>
-      </div>
-    </div>
-
-    <!-- ==================== 文字の大きさ設定 ==================== -->
-    <div id="fontSizeSettings" class="container-box font-size-settings page">
-      <h2>文字の大きさ</h2>
-      <div class="font-size-options">
-        <span class="font-size-label">Frame 4</span>
-        <div class="font-size-buttons">
-          <button class="font-btn small" onclick="changeFontSize('small')">小</button>
-          <button class="font-btn medium active" onclick="changeFontSize('medium')">中</button>
-          <button class="font-btn large" onclick="changeFontSize('large')">大</button>
+        <div id="expertLogin" class="login-container page">
+            <h2>専門家ログイン</h2>
+            <div id="expertLoginError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="expertEmail">メールアドレス</label><input type="email" id="expertEmail"></div>
+            <div class="form-group"><label for="expertPassword">パスワード</label><input type="password" id="expertPassword"></div>
+            <button class="btn btn-login" onclick="handleExpertLogin()">ログイン</button>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('expertRegister');">こちらから</button>
+            </div>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('home');">← ホームへ戻る</button>
+            </div>
         </div>
-      </div>
-      <div style="margin-top: 30px;">
-        <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
-      </div>
-    </div>
 
-    <!-- ==================== パスワード再設定 ==================== -->
-    <div id="passwordReset" class="container-box password-reset page">
-      <h2>パスワード再設定</h2>
-      <div id="passwordError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;"></div>
-      <div class="password-form">
-        <div class="password-field">
-          <label for="newPassword">新規パスワード</label>
-          <input type="password" id="newPassword">
+        <div id="expertRegister" class="login-container page">
+            <h2>新規登録（専門家）</h2>
+            <div id="expertRegisterError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="expertName">お名前</label><input type="text" id="expertName"></div>
+            <div class="form-group"><label for="expertEmail2">メールアドレス</label><input type="email" id="expertEmail2"></div>
+            <div class="form-group"><label for="expertPassword2">パスワード</label><input type="password" id="expertPassword2"></div>
+            <div class="form-group"><label for="expertPasswordConfirm">パスワード（確認）</label><input type="password" id="expertPasswordConfirm"></div>
+            <button class="btn btn-register" onclick="handleExpertRegister()">登録する</button>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('expertLogin');">← ログイン画面に戻る</button>
+            </div>
         </div>
-        <div class="password-field">
-          <label for="newPasswordConfirm">新規パスワード（確認）</label>
-          <input type="password" id="newPasswordConfirm">
+
+        <div id="register" class="login-container page">
+            <h2>新規登録（保護者）</h2>
+            <div id="registerError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="name">お名前</label><input type="text" id="name"></div>
+            <div class="form-group"><label for="email2">メールアドレス</label><input type="email" id="email2"></div>
+            <div class="form-group"><label for="password2">パスワード</label><input type="password" id="password2"></div>
+            <div class="form-group"><label for="passwordConfirm">パスワード（確認）</label><input type="password" id="passwordConfirm"></div>
+            <button class="btn btn-register" onclick="handleRegister()">登録する</button>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('login');">← ログイン画面に戻る</button>
+            </div>
         </div>
-        <button class="btn btn-password-submit" onclick="handlePasswordReset()">登録</button>
-      </div>
-      <div style="margin-top: 30px;">
-        <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
-      </div>
-    </div>
 
-    <!-- ==================== メールアドレス再設定 ==================== -->
-    <div id="emailReset" class="container-box email-reset page">
-      <h2>メールアドレス再設定</h2>
-      <div id="emailError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;"></div>
-      <div class="email-form">
-        <div class="email-field">
-          <label for="newEmailConfirm">新規メールアドレス（確認）</label>
-          <input type="email" id="newEmailConfirm">
+        <div id="dashboard" class="container-box dashboard page">
+            <h2>ダッシュボード</h2>
+            <div class="welcome-text"><span id="userName"></span>さん、ようこそ!</div>
+            <div class="dashboard-content">
+                <div class="card" onclick="alert('保護者同士のコミュニケーション機能（準備中）')">
+                    <div class="card-icon">👥</div>
+                    <h3>保護者同士のコミュニケーション</h3>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📰</div>
+                    <h3>保護者の方にお勧めの記事</h3>
+                    <div class="card-buttons">
+                        <button class="card-btn" onclick="alert('記事1（準備中）')">記事1</button>
+                        <button class="card-btn" onclick="alert('記事2（準備中）')">記事2</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💬</div>
+                    <h3>専門家との話し合い</h3>
+                    <div class="card-buttons">
+                        <button class="card-btn" onclick="alert('就労について（準備中）')">就労について</button>
+                        <button class="card-btn" onclick="alert('放課後デイについて（準備中）')">放課後等デイサービスについて</button>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn logout-btn" onclick="handleLogout()">ログアウト</button>
+            </div>
         </div>
-        <button class="btn btn-email-submit" onclick="handleEmailReset()">登録</button>
-      </div>
-      <div style="margin-top: 30px;">
-        <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
-      </div>
-    </div>
-  </main>
 
-  <!-- ==================== フッター ==================== -->
-  <footer class="site-footer">
-    <div class="container">
-      <small>&copy; 2025 ManabiLink</small>
-    </div>
-  </footer>
+        <div id="settings" class="container-box settings page">
+            <h2>設定</h2>
+            <div class="settings-buttons">
+                <button class="settings-btn" onclick="alert('通知設定（準備中）')">通知設定</button>
+                <button class="settings-btn" onclick="showPage('fontSizeSettings')">文字の大きさ</button>
+                <button class="settings-btn" onclick="alert('アカウント管理（準備中）')">アカウント管理</button>
+                <button class="settings-btn" onclick="showPage('passwordReset')">パスワード再設定</button>
+                <button class="settings-btn" onclick="showPage('emailReset')">メールアドレス再設定</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('dashboard')">← ダッシュボードに戻る</button>
+            </div>
+        </div>
 
-  <script>
-    /* ==================== グローバル変数 ==================== */
-    let users = {};          // 保護者用アカウント
-    let experts = {};        // 専門家用アカウント
-    let currentUser = null;  // 現在ログイン中の保護者
-    let currentExpert = null; // 現在ログイン中の専門家
-    let currentFontSize = 'medium'; // フォントサイズ
+        <div id="fontSizeSettings" class="container-box font-size-settings page">
+            <h2>文字の大きさ</h2>
+            <div class="font-size-options">
+                <span class="font-size-label">設定オプション</span>
+                <div class="font-size-buttons">
+                    <button class="font-btn small" onclick="changeFontSize('small')">小</button>
+                    <button class="font-btn medium active" onclick="changeFontSize('medium')">中</button>
+                    <button class="font-btn large" onclick="changeFontSize('large')">大</button>
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
 
-    /* ==================== ページ遷移・UI制御 ==================== */
-    function showPage(id) {
-      // 全ページを非表示
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      // 指定ページを表示
-      document.getElementById(id).classList.add('active');
-      // エラーメッセージをクリア
-      clearAllErrors();
-      // ページトップへスクロール
-      window.scrollTo(0, 0);
-    }
+        <div id="passwordReset" class="container-box password-reset page">
+            <h2>パスワード再設定</h2>
+            <div id="passwordError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;"></div>
+            <div class="password-form">
+                <div class="password-field">
+                    <label for="newPassword">新規パスワード</label>
+                    <input type="password" id="newPassword">
+                </div>
+                <div class="password-field">
+                    <label for="newPasswordConfirm">新規パスワード（確認）</label>
+                    <input type="password" id="newPasswordConfirm">
+                </div>
+                <button class="btn btn-password-submit" onclick="handlePasswordReset()">登録</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
 
-    function clearAllErrors() {
-      const errorIds = ['loginError', 'registerError', 'expertLoginError', 'expertRegisterError', 'passwordError', 'emailError'];
-      errorIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-      });
-    }
+        <div id="emailReset" class="container-box email-reset page">
+            <h2>メールアドレス再設定</h2>
+            <div id="emailError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;"></div>
+            <div class="email-form">
+                <div class="email-field">
+                    <label for="newEmail">新規メールアドレス</label>
+                    <input type="email" id="newEmail">
+                </div>
+                <div class="email-field">
+                    <label for="newEmailConfirm">新規メールアドレス（確認）</label>
+                    <input type="email" id="newEmailConfirm">
+                </div>
+                <button class="btn btn-email-submit" onclick="handleEmailReset()">登録</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
+    </main>
 
-    function showError(elementId, message) {
-      const errorElement = document.getElementById(elementId);
-      if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-      }
-    }
+    <footer class="site-footer">
+        <div class="container">
+            <small>&copy; 2025 ManabiLink</small>
+        </div>
+    </footer>
 
-    function toggleMenu() {
-      document.getElementById('menuOverlay').classList.toggle('open');
-      document.getElementById('menuBackdrop').classList.toggle('open');
-    }
-
-    /* ==================== 保護者用認証 ==================== */
-    function handleRegister() {
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email2').value.trim();
-      const password = document.getElementById('password2').value;
-      const passwordConfirm = document.getElementById('passwordConfirm').value;
-
-      if (!name || !email || !password || !passwordConfirm) {
-        showError('registerError', '入力していません');
-        return;
-      }
-      if (password !== passwordConfirm) {
-        showError('registerError', 'パスワードが一致しません');
-        return;
-      }
-      if (users[email]) {
-        showError('registerError', 'このメールアドレスは既に登録されています');
-        return;
-      }
-
-      users[email] = { name, password };
-      document.getElementById('name').value = '';
-      document.getElementById('email2').value = '';
-      document.getElementById('password2').value = '';
-      document.getElementById('passwordConfirm').value = '';
-      alert('登録が完了しました');
-      showPage('login');
-    }
-
-    function handleLogin() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-
-      if (!email || !password) {
-        showError('loginError', '入力していません');
-        return;
-      }
-      if (!users[email] || users[email].password !== password) {
-        showError('loginError', 'メールアドレスかパスワードが一致していません');
-        return;
-      }
-
-      currentUser = users[email];
-      document.getElementById('userName').textContent = currentUser.name;
-      document.getElementById('email').value = '';
-      document.getElementById('password').value = '';
-      showPage('dashboard');
-    }
-
-    /* ==================== 専門家用認証 ==================== */
-    function handleExpertRegister() {
-      const name = document.getElementById('expertName').value.trim();
-      const email = document.getElementById('expertEmail2').value.trim();
-      const password = document.getElementById('expertPassword2').value;
-      const passwordConfirm = document.getElementById('expertPasswordConfirm').value;
-
-      if (!name || !email || !password || !passwordConfirm) {
-        showError('expertRegisterError', '入力していません');
-        return;
-      }
-      if (password !== passwordConfirm) {
-        showError('expertRegisterError', 'パスワードが一致しません');
-        return;
-      }
-      if (experts[email]) {
-        showError('expertRegisterError', 'このメールアドレスは既に登録されています');
-        return;
-      }
-
-      experts[email] = { name, password };
-      document.getElementById('expertName').value = '';
-      document.getElementById('expertEmail2').value = '';
-      document.getElementById('expertPassword2').value = '';
-      document.getElementById('expertPasswordConfirm').value = '';
-      alert('登録が完了しました');
-      showPage('expertLogin');
-    }
-
-    function handleExpertLogin() {
-      const email = document.getElementById('expertEmail').value.trim();
-      const password = document.getElementById('expertPassword').value;
-
-      if (!email || !password) {
-        showError('expertLoginError', '入力していません');
-        return;
-      }
-      if (!experts[email] || experts[email].password !== password) {
-        showError('expertLoginError', 'メールアドレスかパスワードが一致していません');
-        return;
-      }
-
-      currentExpert = experts[email];
-      document.getElementById('expertEmail').value = '';
-      document.getElementById('expertPassword').value = '';
-      showPage('expertDashboard');
-    }
-
-    /* ==================== ログアウト ==================== */
-    function handleLogout() {
-      currentUser = null;
-      currentExpert = null;
-      showPage('home');
-    }
-
-    /* ==================== パスワード再設定 ==================== */
-    function handlePasswordReset() {
-      const newPassword = document.getElementById('newPassword').value;
-      const newPasswordConfirm = document.getElementById('newPasswordConfirm').value;
-
-      if (!newPassword || !newPasswordConfirm) {
-        showError('passwordError', '入力していません');
-        return;
-      }
-      if (newPassword !== newPasswordConfirm) {
-        showError('passwordError', 'パスワードが一致していません');
-        return;
-      }
-
-      if (currentUser) {
-        const userEmail = Object.keys(users).find(email => users[email] === currentUser);
-        if (userEmail) {
-          users[userEmail].password = newPassword;
-          currentUser.password = newPassword;
-        }
-      }
-
-      document.getElementById('newPassword').value = '';
-      document.getElementById('newPasswordConfirm').value = '';
-      alert('パスワードが変更されました');
-      showPage('settings');
-    }
-
-    /* ==================== メールアドレス再設定 ==================== */
-    function handleEmailReset() {
-      const newEmail = document.getElementById('newEmail').value.trim();
-      const newEmailConfirm = document.getElementById('newEmailConfirm').value.trim();
-
-      if (!newEmail || !newEmailConfirm) {
-        showError('emailError', '入力していません');
-        return;
-      }
-      if (newEmail !== newEmailConfirm) {
-        showError('emailError', 'メールアドレスが一致していません');
-        return;
-      }
-      if (users[newEmail]) {
-        showError('emailError', 'このメールアドレスは既に使用されています');
-        return;
-      }
-
-      if (currentUser) {
-        const oldEmail = Object.keys(users).find(email => users[email] === currentUser);
-        if (oldEmail) {
-          users[newEmail] = users[oldEmail];
-          delete users[oldEmail];
-        }
-      }
-
-      document.getElementById('newEmail').value = '';
-      document.getElementById('newEmailConfirm').value = '';
-      alert('メールアドレスが変更されました');
-      showPage('settings');
-    }
-
-    /* ==================== フォントサイズ変更 ==================== */
-    function changeFontSize(size) {
-      document.body.classList.remove('font-small', 'font-medium', 'font-large');
-      document.body.classList.add('font-' + size);
-      currentFontSize = size;
-      
-      document.querySelectorAll('.font-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector('.font-btn.' + size).classList.add('active');
-    }
-  </script>
+    <script src="index.js"></script>
 </body>
-</html>field">
-          <label for="newEmail">新規メールアドレス</label>
-          <input type="email" id="newEmail">
-        </div>
-        <div class="email-
+</html>

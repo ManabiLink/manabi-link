@@ -154,7 +154,6 @@
 </div>
 
 <script>
-// 🎌 日本の祝日データ
 const HOLIDAYS = {
   "2025-01-01": "元日", "2025-01-13": "成人の日", "2025-02-11": "建国記念の日",
   "2025-02-23": "天皇誕生日", "2025-03-20": "春分の日", "2025-04-29": "昭和の日",
@@ -251,6 +250,7 @@ function openEditor(e) {
   document.getElementById("titleInput").value = data.title || "";
   document.getElementById("bodyInput").value = data.body || "";
   notifyInput.value = data.notify || "";
+  notifyInput.min = new Date().toISOString().slice(0,16);
 }
 
 saveBtn.onclick = () => {
@@ -258,6 +258,10 @@ saveBtn.onclick = () => {
   const title = document.getElementById("titleInput").value;
   const body = document.getElementById("bodyInput").value;
   const notify = notifyInput.value;
+  if (notify && notify < new Date().toISOString().slice(0,16)) {
+    alert("通知日時は現在以降に設定してください💖");
+    return;
+  }
   const dataSet = currentMode === "normal" ? events : meds;
   dataSet[selectedDate] = { title, body, notify };
   localStorage.setItem(currentMode === "normal" ? "events" : "meds", JSON.stringify(dataSet));
@@ -290,23 +294,21 @@ medBtn.onclick = () => {
   editor.style.display = "none";
 };
 
-// 🔔 通知許可リクエスト
 if ("Notification" in window) {
   Notification.requestPermission().then(p => {
     if (p === "granted") console.log("通知が許可されました");
   });
 }
 
-// ⏰ 通知監視（1分ごと）
 setInterval(() => {
-  const now = new Date().toISOString().slice(0,16); // YYYY-MM-DDTHH:mm
   checkAndNotify(events);
   checkAndNotify(meds);
 }, 60000);
 
 function checkAndNotify(dataset) {
+  const now = new Date().toISOString().slice(0,16);
   for (const [date, ev] of Object.entries(dataset)) {
-    if (ev.notify && ev.notify === new Date().toISOString().slice(0,16)) {
+    if (ev.notify && ev.notify === now) {
       new Notification(ev.title || "予定", { body: ev.body || "通知です💖" });
     }
   }

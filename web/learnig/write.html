@@ -1,329 +1,232 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>もじのおけいこ</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Arial', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
-            background: linear-gradient(135deg, #ffc3e1 0%, #ff9ec9 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 30px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
-            width: 100%;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .selection-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-        
-        .select-btn {
-            padding: 20px 40px;
-            font-size: 1.5em;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .select-btn.hiragana {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-        
-        .select-btn.katakana {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-        
-        .select-btn.alphabet {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: white;
-        }
-        
-        .select-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        
-        .select-btn.active {
-            transform: scale(1.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        
-        .display-area {
-            text-align: center;
-            margin: 40px 0;
-            min-height: 200px;
-            background: #f8f9fa;
-            border-radius: 20px;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .character-display {
-            font-size: 8em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
-        }
-        
-        .character-info {
-            font-size: 1.5em;
-            color: #666;
-            margin-top: 10px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .action-btn {
-            padding: 25px 50px;
-            font-size: 1.8em;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            color: white;
-        }
-        
-        .trace-btn {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-        
-        .read-btn {
-            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        
-        .action-btn:active {
-            transform: translateY(0);
-        }
-        
-        canvas {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            background: white;
-            cursor: crosshair;
-            touch-action: none;
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        
-        .nav-btn {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            background: #667eea;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .nav-btn:hover {
-            background: #5568d3;
-            transform: scale(1.05);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>もじのおけいこ</title>
+<style>
+  body {
+    font-family: 'Arial', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #ffc3e1 0%, #ff9ec9 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+  }
+  h1 {
+    color: #667eea;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+  }
+  .selection-buttons, .dan-buttons, .action-buttons, .nav-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .select-btn, .dan-btn, .action-btn, .nav-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.3em;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: 0.3s;
+  }
+  .select-btn.hiragana { background: #f093fb; }
+  .select-btn.katakana { background: #4facfe; }
+  .select-btn.alphabet { background: #43e97b; }
+  .dan-btn { background: #667eea; }
+  .select-btn:hover, .dan-btn:hover, .action-btn:hover, .nav-btn:hover {
+    transform: scale(1.05);
+  }
+  .display-area {
+    background: #f8f9fa;
+    border-radius: 20px;
+    padding: 40px;
+    margin-top: 20px;
+  }
+  canvas {
+    border: 3px dashed #667eea;
+    border-radius: 15px;
+    background: white;
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌈 もじの おけいこ 🌈</h1>
-        
-        <div class="selection-buttons">
-            <button class="select-btn hiragana" onclick="selectType('hiragana')">ひらがな</button>
-            <button class="select-btn katakana" onclick="selectType('katakana')">カタカナ</button>
-            <button class="select-btn alphabet" onclick="selectType('alphabet')">アルファベット</button>
-        </div>
-        
-        <div class="display-area" id="displayArea">
-            <div style="color: #999; font-size: 1.5em;">上のボタンを おしてね！</div>
-        </div>
-        
-        <div class="action-buttons" id="actionButtons" style="display: none;">
-            <button class="action-btn trace-btn" onclick="startTracing()" id="traceBtn">🔄 もういちど</button>
-            <button class="action-btn read-btn" onclick="readAloud()">🔊 よみきかせ</button>
-        </div>
-        
-        <div class="nav-buttons" id="navButtons" style="display: none;">
-            <button class="nav-btn" onclick="prevChar()">⬅️ まえ</button>
-            <button class="nav-btn" onclick="nextChar()">つぎ ➡️</button>
-        </div>
+  <div class="container">
+    <h1>🌈 もじの おけいこ 🌈</h1>
+
+    <!-- 種類選択 -->
+    <div class="selection-buttons">
+      <button class="select-btn hiragana" onclick="selectType('hiragana')">ひらがな</button>
+      <button class="select-btn katakana" onclick="selectType('katakana')">カタカナ</button>
+      <button class="select-btn alphabet" onclick="selectType('alphabet')">アルファベット</button>
     </div>
 
-    <script>
-        const characters = {
-            hiragana: ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ', 'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'ま', 'み', 'む', 'め', 'も', 'や', 'ゆ', 'よ', 'ら', 'り', 'る', 'れ', 'ろ', 'わ', 'を', 'ん'],
-            katakana: ['ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ', 'サ', 'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト', 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ', 'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ', 'ル', 'レ', 'ロ', 'ワ', 'ヲ', 'ン'],
-            alphabet: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-        };
-        
-        let currentType = null;
-        let currentIndex = 0;
-        let isTracing = false;
-        
-        function selectType(type) {
-            currentType = type;
-            currentIndex = 0;
-            
-            document.querySelectorAll('.select-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            isTracing = true;
-            displayCharacter();
-            document.getElementById('actionButtons').style.display = 'flex';
-            document.getElementById('navButtons').style.display = 'flex';
-        }
-        
-        function displayCharacter() {
-            if (!currentType) return;
-            
-            const char = characters[currentType][currentIndex];
-            const displayArea = document.getElementById('displayArea');
-            
-            if (isTracing) {
-                displayArea.innerHTML = `<canvas id="traceCanvas" width="400" height="400"></canvas>`;
-                setupCanvas(char);
-            } else {
-                let typeName = currentType === 'hiragana' ? 'ひらがな' : 
-                               currentType === 'katakana' ? 'カタカナ' : 'アルファベット';
-                displayArea.innerHTML = `
-                    <div class="character-display">${char}</div>
-                    <div class="character-info">${typeName} (${currentIndex + 1}/${characters[currentType].length})</div>
-                `;
-            }
-        }
-        
-        function setupCanvas(char) {
-            const canvas = document.getElementById('traceCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            ctx.fillStyle = '#f0f0f0';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.font = 'bold 250px Arial';
-            ctx.fillStyle = '#ddd';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(char, canvas.width/2, canvas.height/2);
-            
-            let drawing = false;
-            
-            function startDrawing(e) {
-                drawing = true;
-                draw(e);
-            }
-            
-            function stopDrawing() {
-                drawing = false;
-                ctx.beginPath();
-            }
-            
-            function draw(e) {
-                if (!drawing) return;
-                
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX || e.touches[0].clientX) - rect.left;
-                const y = (e.clientY || e.touches[0].clientY) - rect.top;
-                
-                ctx.lineWidth = 15;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = '#667eea';
-                
-                ctx.lineTo(x, y);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-            }
-            
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('touchstart', startDrawing);
-            canvas.addEventListener('touchend', stopDrawing);
-            canvas.addEventListener('touchmove', draw);
-        }
-        
-        function startTracing() {
-            isTracing = true;
-            displayCharacter();
-        }
-        
-        function readAloud() {
-            if (!currentType) return;
-            
-            const char = characters[currentType][currentIndex];
-            const utterance = new SpeechSynthesisUtterance(char);
-            utterance.lang = currentType === 'alphabet' ? 'en-US' : 'ja-JP';
-            utterance.rate = 0.8;
-            speechSynthesis.speak(utterance);
-        }
-        
-        function nextChar() {
-            if (!currentType) return;
-            currentIndex = (currentIndex + 1) % characters[currentType].length;
-            isTracing = true;
-            displayCharacter();
-        }
-        
-        function prevChar() {
-            if (!currentType) return;
-            currentIndex = (currentIndex - 1 + characters[currentType].length) % characters[currentType].length;
-            isTracing = true;
-            displayCharacter();
-        }
-    </script>
+    <!-- 段ボタン -->
+    <div class="dan-buttons" id="danButtons" style="display: none;"></div>
+
+    <!-- 表示領域 -->
+    <div class="display-area" id="displayArea">
+      <div style="color:#999;font-size:1.5em;">上のボタンを おしてね！</div>
+    </div>
+
+    <!-- 操作ボタン -->
+    <div class="action-buttons" id="actionButtons" style="display:none;">
+      <button class="action-btn" style="background:#fa709a;" onclick="startTracing()">🔄 もういちど</button>
+      <button class="action-btn" style="background:#30cfd0;" onclick="readAloud()">🔊 よみきかせ</button>
+    </div>
+
+    <div class="nav-buttons" id="navButtons" style="display:none;">
+      <button class="nav-btn" style="background:#667eea;" onclick="prevChar()">⬅️ まえ</button>
+      <button class="nav-btn" style="background:#667eea;" onclick="nextChar()">つぎ ➡️</button>
+    </div>
+  </div>
+
+  <script>
+    const hiraganaRows = {
+      あ段: ['あ','い','う','え','お'],
+      か段: ['か','き','く','け','こ'],
+      さ段: ['さ','し','す','せ','そ'],
+      た段: ['た','ち','つ','て','と'],
+      な段: ['な','に','ぬ','ね','の'],
+      は段: ['は','ひ','ふ','へ','ほ'],
+      ま段: ['ま','み','む','め','も'],
+      や段: ['や','ゆ','よ'],
+      ら段: ['ら','り','る','れ','ろ'],
+      わ段: ['わ','を','ん']
+    };
+
+    const katakanaRows = {
+      ア段: ['ア','イ','ウ','エ','オ'],
+      カ段: ['カ','キ','ク','ケ','コ'],
+      サ段: ['サ','シ','ス','セ','ソ'],
+      タ段: ['タ','チ','ツ','テ','ト'],
+      ナ段: ['ナ','ニ','ヌ','ネ','ノ'],
+      ハ段: ['ハ','ヒ','フ','ヘ','ホ'],
+      マ段: ['マ','ミ','ム','メ','モ'],
+      ヤ段: ['ヤ','ユ','ヨ'],
+      ラ段: ['ラ','リ','ル','レ','ロ'],
+      ワ段: ['ワ','ヲ','ン']
+    };
+
+    const alphabetGroups = {
+      ABC: ['A','B','C','D','E'],
+      FGH: ['F','G','H','I','J'],
+      KLM: ['K','L','M','N','O'],
+      PQRS: ['P','Q','R','S','T'],
+      TUVWXYZ: ['U','V','W','X','Y','Z']
+    };
+
+    let currentType = null;
+    let currentGroup = [];
+    let currentIndex = 0;
+
+    function selectType(type) {
+      currentType = type;
+      const danButtons = document.getElementById("danButtons");
+      danButtons.innerHTML = "";
+
+      const data = type === 'hiragana' ? hiraganaRows :
+                   type === 'katakana' ? katakanaRows : alphabetGroups;
+
+      for (let key in data) {
+        const btn = document.createElement("button");
+        btn.className = "dan-btn";
+        btn.textContent = key;
+        btn.onclick = () => selectDan(key);
+        danButtons.appendChild(btn);
+      }
+
+      danButtons.style.display = "flex";
+      document.getElementById('displayArea').innerHTML =
+        `<div style="color:#999;font-size:1.5em;">${type === 'alphabet' ? 'グループを選んでね！' : '段を選んでね！'}</div>`;
+    }
+
+    function selectDan(key) {
+      const data = currentType === 'hiragana' ? hiraganaRows :
+                   currentType === 'katakana' ? katakanaRows : alphabetGroups;
+      currentGroup = data[key];
+      currentIndex = 0;
+      displayCharacter();
+      document.getElementById('actionButtons').style.display = 'flex';
+      document.getElementById('navButtons').style.display = 'flex';
+    }
+
+    function displayCharacter() {
+      const char = currentGroup[currentIndex];
+      const displayArea = document.getElementById("displayArea");
+      displayArea.innerHTML = `<canvas id="traceCanvas" width="400" height="400"></canvas>`;
+      setupCanvas(char);
+    }
+
+    function setupCanvas(char) {
+      const canvas = document.getElementById('traceCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = 'bold 250px Arial';
+      ctx.fillStyle = '#ddd';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(char, canvas.width/2, canvas.height/2);
+
+      let drawing = false;
+      canvas.addEventListener('mousedown', () => { drawing = true; ctx.beginPath(); });
+      canvas.addEventListener('mouseup', () => drawing = false);
+      canvas.addEventListener('mousemove', (e) => draw(e, canvas, ctx, drawing));
+      canvas.addEventListener('touchstart', (e) => { drawing = true; draw(e.touches[0], canvas, ctx, drawing); });
+      canvas.addEventListener('touchend', () => drawing = false);
+      canvas.addEventListener('touchmove', (e) => draw(e.touches[0], canvas, ctx, drawing));
+    }
+
+    function draw(e, canvas, ctx, drawing) {
+      if (!drawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      ctx.lineWidth = 15;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#667eea';
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    function startTracing() {
+      displayCharacter();
+    }
+
+    function readAloud() {
+      const char = currentGroup[currentIndex];
+      const utterance = new SpeechSynthesisUtterance(char);
+      utterance.lang = currentType === 'alphabet' ? 'en-US' : 'ja-JP';
+      utterance.rate = 0.8;
+      speechSynthesis.speak(utterance);
+    }
+
+    function nextChar() {
+      currentIndex = (currentIndex + 1) % currentGroup.length;
+      displayCharacter();
+    }
+
+    function prevChar() {
+      currentIndex = (currentIndex - 1 + currentGroup.length) % currentGroup.length;
+      displayCharacter();
+    }
+  </script>
 </body>
 </html>

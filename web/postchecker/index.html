@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記事投稿承認システム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #FFE4E8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            grid-column: 1 / -1;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #FFB6C1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #FFB6C1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FF69B4;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .submit-btn {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover {
+            background-color: #FF1493;
+        }
+
+        .pending-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pending-item {
+            background-color: #FFF5F7;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #FFB6C1;
+            position: relative;
+        }
+
+        .pending-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .pending-item-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .pending-item-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .approve-btn, .reject-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .approve-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background-color: #45a049;
+        }
+
+        .reject-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background-color: #da190b;
+        }
+
+        .published-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .published-item {
+            background-color: #f0f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #a5d8ff;
+        }
+
+        .published-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .published-item-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .published-item-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 記事投稿承認システム</h1>
+            <p class="subtitle">投稿された記事を確認し、適切な内容のみ公開します</p>
+        </div>
+
+        <!-- 投稿フォーム -->
+        <div class="section">
+            <h2 class="section-title">
+                <span>✏️</span>
+                <span>記事を投稿</span>
+            </h2>
+            <div id="alert-container"></div>
+            <form id="article-form">
+                <div class="form-group">
+                    <label for="article-title">記事タイトル</label>
+                    <input type="text" id="article-title" placeholder="例: 子どもの睡眠習慣について" required>
+                </div>
+                <div class="form-group">
+                    <label for="article-content">記事内容</label>
+                    <textarea id="article-content" placeholder="記事の内容を入力してください..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">投稿して承認を待つ</button>
+            </form>
+        </div>
+
+        <!-- 承認待ち記事 -->
+        <div class="section">
+            <h2 class="section-title">
+                <span>⏳</span>
+                <span>承認待ち記事</span>
+                <span class="status-badge status-pending" id="pending-count">0件</span>
+            </h2>
+            <div id="pending-list" class="pending-list">
+                <div class="empty-state">承認待ちの記事はありません</div>
+            </div>
+        </div>
+
+        <!-- 公開済み記事 -->
+        <div class="section" style="grid-column: 1 / -1;">
+            <h2 class="section-title">
+                <span>✅</span>
+                <span>公開済み記事</span>
+                <span class="status-badge status-approved" id="published-count">0件</span>
+            </h2>
+            <div id="published-list" class="published-list">
+                <div class="empty-state">公開済みの記事はありません</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 不適切な表現のリスト
+        const inappropriateWords = [
+            '暴力', '差別', '誹謗中傷', '攻撃', '侮辱', '脅迫',
+            '死ね', 'バカ', 'アホ', 'クズ', '殺す', '嫌い'
+        ];
+
+        let pendingArticles = [];
+        let publishedArticles = [];
+        let nextId = 1;
+
+        // 要素取得
+        const articleForm = document.getElementById('article-form');
+        const pendingList = document.getElementById('pending-list');
+        const publishedList = document.getElementById('published-list');
+        const pendingCount = document.getElementById('pending-count');
+        const publishedCount = document.getElementById('published-count');
+        const alertContainer = document.getElementById('alert-container');
+
+        // 初期表示
+        updateDisplay();
+
+        // フォーム送信
+        articleForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('article-title').value;
+            const content = document.getElementById('article-content').value;
+            
+            // 不適切な表現チェック
+            const hasInappropriateContent = checkInappropriateContent(title + ' ' + content);
+            
+            if (hasInappropriateContent) {
+                showAlert('この記事には不適切な表現が含まれているため、投稿できませんでした。', 'error');
+                return;
+            }
+            
+            // 承認待ちリストに追加
+            const article = {
+                id: nextId++,
+                title,
+                content,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            
+            pendingArticles.push(article);
+            
+            articleForm.reset();
+            showAlert('記事を投稿しました。承認をお待ちください。', 'success');
+            updateDisplay();
+        });
+
+        // 不適切な表現チェック
+        function checkInappropriateContent(text) {
+            return inappropriateWords.some(word => text.includes(word));
+        }
+
+        // アラート表示
+        function showAlert(message, type) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // 画面更新
+        function updateDisplay() {
+            // 承認待ちリスト更新
+            if (pendingArticles.length === 0) {
+                pendingList.innerHTML = '<div class="empty-state">承認待ちの記事はありません</div>';
+            } else {
+                pendingList.innerHTML = '';
+                pendingArticles.forEach(article => {
+                    const item = document.createElement('div');
+                    item.className = 'pending-item';
+                    item.innerHTML = `
+                        <div class="pending-item-title">${article.title}</div>
+                        <div class="pending-item-content">${article.content}</div>
+                        <div class="pending-item-time">📅 ${getTimeAgo(article.timestamp)}</div>
+                        <div class="action-buttons">
+                            <button class="approve-btn" onclick="approveArticle(${article.id})">
+                                ✓ 承認して公開
+                            </button>
+                            <button class="reject-btn" onclick="rejectArticle(${article.id})">
+                                ✕ 却下
+                            </button>
+                        </div>
+                    `;
+                    pendingList.appendChild(item);
+                });
+            }
+            
+            // 公開済みリスト更新
+            if (publishedArticles.length === 0) {
+                publishedList.innerHTML = '<div class="empty-state">公開済みの記事はありません</div>';
+            } else {
+                publishedList.innerHTML = '';
+                // 新しい順に並べ替え
+                const sortedArticles = [...publishedArticles].sort((a, b) => b.publishedAt - a.publishedAt);
+                sortedArticles.forEach(article => {
+                    const item = document.createElement('div');
+                    item.className = 'published-item';
+                    item.innerHTML = `
+                        <div class="published-item-title">${article.title}</div>
+                        <div class="published-item-content">${article.content}</div>
+                        <div class="published-item-time">📅 投稿: ${getTimeAgo(article.timestamp)} | 公開: ${getTimeAgo(article.publishedAt)}</div>
+                    `;
+                    publishedList.appendChild(item);
+                });
+            }
+            
+            // カウント更新
+            pendingCount.textContent = `${pendingArticles.length}件`;
+            publishedCount.textContent = `${publishedArticles.length}件`;
+        }
+
+        // 記事承認
+        function approveArticle(id) {
+            const article = pendingArticles.find(a => a.id === id);
+            if (article) {
+                article.status = 'approved';
+                article.publishedAt = Date.now();
+                publishedArticles.push(article);
+                pendingArticles = pendingArticles.filter(a => a.id !== id);
+                showAlert(`「${article.title}」を承認し、公開しました。`, 'success');
+                updateDisplay();
+            }
+        }
+
+        // 記事却下
+        function rejectArticle(id) {
+            const article = pendingArticles.find(a => a.id === id);
+            if (article && confirm(`「${article.title}」を却下しますか？`)) {
+                pendingArticles = pendingArticles.filter(a => a.id !== id);
+                showAlert(`「${article.title}」を却下しました。`, 'error');
+                updateDisplay();
+            }
+        }
+
+        // 経過時間計算
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (minutes < 1) return 'たった今';
+            if (minutes < 60) return `${minutes}分前`;
+            if (hours < 24) return `${hours}時間前`;
+            return `${days}日前`;
+        }
+    </script>
+</body>
+</html>

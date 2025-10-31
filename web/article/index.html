@@ -144,6 +144,12 @@
             gap: 5px;
         }
 
+        .article-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
         .popular-badge {
             position: absolute;
             top: 10px;
@@ -537,6 +543,7 @@
                 card.setAttribute('data-article-id', id);
                 
                 const isPopular = currentSort === 'popular' && index < 3;
+                const timeAgo = getTimeAgo(article.timestamp);
                 
                 card.innerHTML = `
                     ${isPopular ? '<div class="popular-badge">🔥 人気</div>' : ''}
@@ -553,6 +560,7 @@
                             ${article.likes}
                         </div>
                     </div>
+                    <div class="article-time">📅 ${timeAgo}</div>
                 `;
                 
                 card.addEventListener('click', function(e) {
@@ -566,12 +574,32 @@
             });
         }
 
+        // 経過時間を計算
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const weeks = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
+            const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+            
+            if (minutes < 1) return 'たった今';
+            if (minutes < 60) return `${minutes}分前`;
+            if (hours < 24) return `${hours}時間前`;
+            if (days < 7) return `${days}日前`;
+            if (weeks < 4) return `${weeks}週間前`;
+            return `${months}ヶ月前`;
+        }
+
         // 記事詳細表示
         function showArticle(articleId) {
             const article = articles[articleId];
             
             if (article) {
                 article.views++;
+                const timeAgo = getTimeAgo(article.timestamp);
                 
                 modalBody.innerHTML = `
                     <h2 style="color: #333; margin-bottom: 20px;">${article.title}</h2>
@@ -579,6 +607,7 @@
                     <div class="modal-stats">
                         <span>👁️ 閲覧数: ${article.views}</span>
                         <span>❤️ いいね: ${article.likes}</span>
+                        <span>📅 投稿: ${timeAgo}</span>
                     </div>
                 `;
                 articleModal.style.display = 'block';

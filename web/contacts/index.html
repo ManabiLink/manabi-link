@@ -1,179 +1,158 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>きゅるん♡お問い合わせフォーム</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Zen Maru Gothic", "Noto Sans JP", sans-serif;
-      background: linear-gradient(180deg, #ffeaf5, #fff5f8, #fff);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: bgFloat 8s ease-in-out infinite alternate;
-    }
-    @keyframes bgFloat {
-      0% { background-position: 0% 0%; }
-      100% { background-position: 100% 100%; }
-    }
-    .contact-container {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 30px;
-      box-shadow: 0 10px 30px rgba(255, 150, 180, 0.25),
-                  0 0 0 8px rgba(255, 220, 240, 0.6) inset;
-      padding: 40px 50px;
-      width: 90%;
-      max-width: 520px;
-      text-align: center;
-      backdrop-filter: blur(8px);
-      animation: fadeIn 0.6s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    h1 {
-      font-size: 1.8rem;
-      color: #ff69b4;
-      text-shadow: 0 2px 6px rgba(255, 105, 180, 0.3);
-      margin-bottom: 10px;
-    }
-    .lead { color: #888; font-size: 0.95rem; margin-bottom: 25px; }
-    .form-group { margin-bottom: 20px; text-align: left; }
-    label { font-weight: bold; color: #ff5fa0; display: block; margin-bottom: 5px; font-size: 0.95rem; }
-    input, textarea, select {
-      width: 100%; padding: 12px; border-radius: 15px;
-      border: 2px solid #ffd6e8; background: #fffafa;
-      font-size: 1rem; transition: all 0.25s ease;
-      box-shadow: inset 2px 2px 5px rgba(255, 200, 220, 0.4);
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: #ff8ac7;
-      box-shadow: 0 0 10px rgba(255, 160, 210, 0.3),
-                  inset 2px 2px 5px rgba(255, 190, 210, 0.4);
-      outline: none;
-    }
-    textarea { resize: none; height: 120px; }
-    .btn {
-      background: linear-gradient(180deg, #ffb7e2, #ff7ecf);
-      color: white; font-weight: bold; font-size: 1.1rem;
-      padding: 12px; border: none; border-radius: 20px;
-      width: 100%; box-shadow: 0 6px 15px rgba(255, 120, 180, 0.3);
-      cursor: pointer; transition: all 0.2s ease;
-    }
-    .btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(255, 140, 200, 0.35); }
-    .btn:active { transform: scale(0.97); box-shadow: 0 4px 10px rgba(255, 140, 200, 0.3); }
-    #feedback { margin-top: 15px; font-weight: bold; font-size: 0.95rem; min-height: 25px; color: #ff69b4; }
-    .fluffy { position: absolute; border-radius: 50%; filter: blur(25px); opacity: 0.6; animation: float 6s ease-in-out infinite alternate; }
-    @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-15px) scale(1.05); } }
-    .pink { width: 180px; height: 180px; background: #ffb6e6; top: 10%; left: 8%; }
-    .blue { width: 220px; height: 220px; background: #c8e7ff; bottom: 10%; right: 10%; }
-    .yellow { width: 100px; height: 100px; background: #fff9c8; top: 60%; left: 15%; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>きゅるん♡フォーム（Discord＋Firebase）</title>
+<style>
+body {
+  margin:0;
+  font-family:"Zen Maru Gothic","Noto Sans JP",sans-serif;
+  background: linear-gradient(180deg,#ffeaf5,#fff5f8,#fff);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.container {
+  background: rgba(255,255,255,0.95);
+  border-radius:25px;
+  padding:40px 50px;
+  width:90%;
+  max-width:520px;
+  box-shadow:0 8px 30px rgba(255,150,180,0.25);
+}
+h1{color:#ff69b4;text-align:center;margin-bottom:15px;}
+.form-group{margin-bottom:15px;}
+label{display:block;font-weight:bold;color:#ff5fa0;margin-bottom:5px;}
+input,textarea,select{
+  width:100%;padding:10px;border-radius:12px;border:2px solid #ffd6e8;font-size:1rem;transition:0.2s;
+}
+input:focus,textarea:focus,select:focus{border-color:#ff8ac7;outline:none;}
+textarea{height:100px;resize:none;}
+button{
+  background:linear-gradient(180deg,#ffb7e2,#ff7ecf);
+  color:white;font-weight:bold;padding:12px;border:none;border-radius:20px;width:100%;font-size:1.1rem;cursor:pointer;
+}
+button:hover{transform:scale(1.05);}
+#feedback{margin-top:10px;text-align:center;min-height:20px;font-weight:bold;color:#ff69b4;}
+</style>
 </head>
 <body>
-  <div class="fluffy pink"></div>
-  <div class="fluffy blue"></div>
-  <div class="fluffy yellow"></div>
+<div class="container">
+  <h1>きゅるん♡お問い合わせ</h1>
+  <form id="form">
+    <div class="form-group">
+      <label for="title">タイトル</label>
+      <input type="text" id="title" required placeholder="タイトルを入力してね♡">
+    </div>
+    <div class="form-group">
+      <label for="kind">種別</label>
+      <select id="kind" required>
+        <option value="">選択してね♡</option>
+        <option value="質問">💬 質問</option>
+        <option value="要望">🌈 要望</option>
+        <option value="不具合報告">🐞 不具合報告</option>
+        <option value="その他">🎀 その他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="content">本文</label>
+      <textarea id="content" required placeholder="本文を入力してね♡"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" id="email" required placeholder="example@mail.com">
+    </div>
+    <div class="form-group">
+      <label for="name">名前（任意）</label>
+      <input type="text" id="name" placeholder="匿名でもOK♡">
+    </div>
+    <button type="submit">💌 送信する</button>
+    <p id="feedback"></p>
+  </form>
+</div>
 
-  <main class="contact-container">
-    <h1>きゅるん♡お問い合わせ</h1>
-    <p class="lead">ご意見・ご質問など、お気軽にどうぞ🌷</p>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <form id="contactForm">
-      <div class="form-group">
-        <label for="title">タイトル</label>
-        <input type="text" id="title" name="title" required placeholder="タイトルを入力してね♡" />
-      </div>
+<script>
+  // 🔑 Firebase設定
+  const firebaseConfig = {
+    apiKey: "API_KEY",
+    authDomain: "PROJECT_ID.firebaseapp.com",
+    projectId: "PROJECT_ID",
+    storageBucket: "PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-      <div class="form-group">
-        <label for="category">種別</label>
-        <select id="category" name="category" required>
-          <option value="">選択してね♡</option>
-          <option value="質問">💬 質問</option>
-          <option value="要望">🌈 要望</option>
-          <option value="不具合報告">🐞 不具合報告</option>
-          <option value="その他">🎀 その他</option>
-        </select>
-      </div>
+  const form = document.getElementById('form');
+  const feedback = document.getElementById('feedback');
 
-      <div class="form-group">
-        <label for="message">内容</label>
-        <textarea id="message" name="message" required placeholder="お問い合わせ内容を入力してね♡"></textarea>
-      </div>
+  // 🔔 Discord Webhook URL
+  const webhookURL = "https://discordapp.com/api/webhooks/1433692231688257638/oxlgPYE7yzSLqJk69zorMCHch6wEtty1CMcT9kM6348bAi-vwwaKsiConXhmKxGZQkn1";
 
-      <div class="form-group">
-        <label for="email">メールアドレス</label>
-        <input type="email" id="email" name="email" required placeholder="example@mail.com" />
-      </div>
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    feedback.textContent="";
 
-      <div class="form-group">
-        <label for="name">お名前（任意）</label>
-        <input type="text" id="name" name="name" placeholder="匿名でもOKだよ♡" />
-      </div>
+    const data = {
+      title: document.getElementById('title').value,
+      kind: document.getElementById('kind').value,
+      content: document.getElementById('content').value,
+      email: document.getElementById('email').value,
+      name: document.getElementById('name').value || "匿名",
+      timestamp: new Date()
+    };
 
-      <button type="submit" class="btn">💌 送信する</button>
-      <p id="feedback"></p>
-    </form>
-  </main>
+    // ① Firebaseに保存
+    try{
+      await db.collection("contacts").add(data);
+    }catch(err){
+      console.error("Firebase保存失敗",err);
+    }
 
-  <script>
-    document.getElementById("contactForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const feedback = document.getElementById("feedback");
-      feedback.textContent = "";
+    // ② Discord通知
+    const payload = {
+      content:"📩 **新しいお問い合わせが届きました！**",
+      embeds:[{
+        title: `💖 ${data.title}`,
+        color:0xff9fd3,
+        fields:[
+          {name:"🗂 種別", value:data.kind, inline:true},
+          {name:"💌 メール", value:data.email, inline:true},
+          {name:"👤 名前", value:data.name, inline:true},
+          {name:"📝 内容", value:data.content.substring(0,1024)}
+        ],
+        footer:{text:"きゅるんフォームより送信されました✨"},
+        timestamp: data.timestamp.toISOString()
+      }]
+    };
 
-      const title = document.getElementById("title").value;
-      const category = document.getElementById("category").value;
-      const message = document.getElementById("message").value;
-      const email = document.getElementById("email").value;
-      const name = document.getElementById("name").value || "匿名";
-
-      // 🔔 Discord Webhook URL（あなたのWebhook URLをここに）
-      const webhookURL = "https://discordapp.com/api/webhooks/1433692231688257638/oxlgPYE7yzSLqJk69zorMCHch6wEtty1CMcT9kM6348bAi-vwwaKsiConXhmKxGZQkn1";
-
-      // Discord送信用メッセージ構築
-      const payload = {
-        content: "📩 **新しいお問い合わせが届きました！**",
-        embeds: [
-          {
-            title: `💖 ${title}`,
-            color: 0xff9fd3,
-            fields: [
-              { name: "🗂 種別", value: category, inline: true },
-              { name: "💌 メールアドレス", value: email, inline: true },
-              { name: "👤 名前", value: name, inline: true },
-              { name: "📝 内容", value: message.substring(0, 1024) }
-            ],
-            footer: { text: "きゅるんフォームより送信されました✨" },
-            timestamp: new Date().toISOString()
-          }
-        ]
-      };
-
-      try {
-        const res = await fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        if (res.ok) {
-          feedback.style.color = "#ff69b4";
-          feedback.textContent = "♡ 送信が完了しました！ありがとう ♡";
-          e.target.reset();
-        } else {
-          feedback.style.color = "#e33";
-          feedback.textContent = "うまく送れませんでした…もう一度試してね🥺";
-        }
-      } catch (err) {
-        feedback.style.color = "#e33";
-        feedback.textContent = "通信エラーが発生しました💦";
+    try{
+      const res = await fetch(webhookURL,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      if(res.ok){
+        feedback.style.color="#ff69b4";
+        feedback.textContent="♡ 送信完了！Firebase＆Discordに届いたよ ♡";
+        form.reset();
+      }else{
+        feedback.style.color="#e33";
+        feedback.textContent="Discord通知に失敗しました💦";
       }
-    });
-  </script>
+    }catch(err){
+      feedback.style.color="#e33";
+      feedback.textContent="通信エラーが発生しました💦";
+      console.error(err);
+    }
+  });
+</script>
 </body>
 </html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習ページ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, #ffc3e1 0%, #ffb7d5 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #ffe6f0;
+      border-radius: 30px;
+      padding: 60px 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 900px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #333;
+      margin-bottom: 80px;
+      font-weight: normal;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 60px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .menu-button {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 4px solid;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      position: relative;
+      color: #333;
+    }
+
+    .trace-button {
+      background: linear-gradient(135deg, #a8b5ff 0%, #8b9fff 100%);
+      border-color: #6b7fd7;
+    }
+
+    .read-button {
+      background: linear-gradient(135deg, #90ee90 0%, #7dd87d 100%);
+      border-color: #5cb85c;
+    }
+
+    .menu-button:hover {
+      transform: translateY(-10px) scale(1.05);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+
+    .menu-button:active {
+      transform: translateY(-5px) scale(1.02);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>学習ページ</h1>
+
+    <div class="button-container">
+      <!-- なぞり書き -->
+      <div class="menu-button trace-button" onclick="goToWritePage()">
+        なぞり書き
+      </div>
+
+      <!-- 読み聞かせ -->
+      <div class="menu-button read-button" onclick="goToReadPage()">
+        読み聞かせ
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goToWritePage() {
+      // write.html へページ遷移
+      window.location.href = "http://127.0.0.1:5500/web/learnig/write.html";
+    }
+
+    function goToReadPage() {
+      // read.html へページ遷移（まだ作ってなければコメントアウトでもOK）
+      window.location.href = "http://127.0.0.1:5500/web/learnig/read.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ManabiLink — ボタンで操作</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="font-medium">
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo">ManabiLink</h1>
+            <nav class="nav">
+                <button onclick="alert('特徴ページへ遷移（準備中）')" style="margin-left: 0;">特徴</button>
+                <button onclick="alert('サービスについてページへ遷移（準備中）')">サービスについて</button>
+                <button onclick="alert('お問い合わせフォームへ遷移（準備中）')">お問い合わせ</button>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <div id="menuBackdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
+    <div id="menuOverlay" class="menu-overlay">
+        <div class="menu-close" onclick="toggleMenu()">×</div>
+        <ul class="menu-items">
+            <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
+            <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
+            <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
+            <li onclick="showPage('settings'); toggleMenu()">設定</li>
+            <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
+        </ul>
+    </div>
+
+    <main>
+        <div id="home" class="container-box home page active">
+            <h2>まなびリンクプロジェクト</h2>
+            <div class="button-area">
+                <button class="home-btn guardian-btn" onclick="showPage('login');">保護者の方はこちら</button>
+                <button class="home-btn expert-btn" onclick="showPage('expertLogin');">専門家の方はこちら</button>
+            </div>
+        </div>
+
+        <div id="login" class="login-container page">
+            <h2>保護者ログイン</h2>
+            <div id="loginError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="email">メールアドレス</label><input type="email" id="email"></div>
+            <div class="form-group"><label for="password">パスワード</label><input type="password" id="password"></div>
+            <button class="btn btn-login" onclick="handleLogin()">ログイン</button>
+            <div class="link">
+                新規登録は <button class="link-btn" onclick="showPage('register');">こちらから</button>
+            </div>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('home');">← ホームへ戻る</button>
+            </div>
+        </div>
+
+        <div id="expertLogin" class="login-container page">
+            <h2>専門家ログイン</h2>
+            <div id="expertLoginError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="expertEmail">メールアドレス</label><input type="email" id="expertEmail"></div>
+            <div class="form-group"><label for="expertPassword">パスワード</label><input type="password" id="expertPassword">
+            </div>
+            <button class="btn btn-login" onclick="handleExpertLogin()">ログイン</button>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('expertRegister');">こちらから</button>
+            </div>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('home');">← ホームへ戻る</button>
+            </div>
+        </div>
+
+        <div id="expertRegister" class="login-container page">
+            <h2>新規登録（専門家）</h2>
+            <div id="expertRegisterError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="expertName">お名前</label><input type="text" id="expertName"></div>
+            <div class="form-group"><label for="expertEmail2">メールアドレス</label><input type="email" id="expertEmail2">
+            </div>
+            <div class="form-group"><label for="expertPassword2">パスワード</label><input type="password"
+                    id="expertPassword2"></div>
+            <div class="form-group"><label for="expertPasswordConfirm">パスワード（確認）</label><input type="password"
+                    id="expertPasswordConfirm"></div>
+            <button class="btn btn-register" onclick="handleExpertRegister()">登録する</button>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('expertLogin');">← ログイン画面に戻る</button>
+            </div>
+        </div>
+
+        <div id="register" class="login-container page">
+            <h2>新規登録（保護者）</h2>
+            <div id="registerError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="name">お名前</label><input type="text" id="name"></div>
+            <div class="form-group"><label for="email2">メールアドレス</label><input type="email" id="email2"></div>
+            <div class="form-group"><label for="password2">パスワード</label><input type="password" id="password2"></div>
+            <div class="form-group"><label for="passwordConfirm">パスワード（確認）</label><input type="password"
+                    id="passwordConfirm"></div>
+            <button class="btn btn-register" onclick="handleRegister()">登録する</button>
+            <div class="link">
+                <button class="link-btn" onclick="showPage('login');">← ログイン画面に戻る</button>
+            </div>
+        </div>
+
+        <div id="dashboard" class="container-box dashboard page">
+            <h2>ダッシュボード</h2>
+            <div class="welcome-text"><span id="userName"></span>さん、ようこそ!</div>
+            <div class="dashboard-content">
+                <div class="card" onclick="alert('保護者同士のコミュニケーション機能（準備中）')">
+                    <div class="card-icon">👥</div>
+                    <h3>保護者同士のコミュニケーション</h3>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📰</div>
+                    <h3>保護者の方にお勧めの記事</h3>
+                    <div class="card-buttons">
+                        <button class="card-btn" onclick="alert('記事1（準備中）')">記事1</button>
+                        <button class="card-btn" onclick="alert('記事2（準備中）')">記事2</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💬</div>
+                    <h3>専門家との話し合い</h3>
+                    <div class="card-buttons">
+                        <button class="card-btn" onclick="alert('就労について（準備中）')">就労について</button>
+                        <button class="card-btn" onclick="alert('放課後デイについて（準備中）')">放課後等デイサービスについて</button>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn logout-btn" onclick="handleLogout()">ログアウト</button>
+            </div>
+        </div>
+
+        <div id="settings" class="container-box settings page">
+            <h2>設定</h2>
+            <div class="settings-buttons">
+                <button class="settings-btn" onclick="alert('通知設定（準備中）')">通知設定</button>
+                <button class="settings-btn" onclick="showPage('fontSizeSettings')">文字の大きさ</button>
+                <button class="settings-btn" onclick="alert('アカウント管理（準備中）')">アカウント管理</button>
+                <button class="settings-btn" onclick="showPage('passwordReset')">パスワード再設定</button>
+                <button class="settings-btn" onclick="showPage('emailReset')">メールアドレス再設定</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('dashboard')">← ダッシュボードに戻る</button>
+            </div>
+        </div>
+
+        <div id="fontSizeSettings" class="container-box font-size-settings page">
+            <h2>文字の大きさ</h2>
+            <div class="font-size-options">
+                <span class="font-size-label">設定オプション</span>
+                <div class="font-size-buttons">
+                    <button class="font-btn small" onclick="changeFontSize('small')">小</button>
+                    <button class="font-btn medium active" onclick="changeFontSize('medium')">中</button>
+                    <button class="font-btn large" onclick="changeFontSize('large')">大</button>
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
+
+        <div id="passwordReset" class="container-box password-reset page">
+            <h2>パスワード再設定</h2>
+            <div id="passwordError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;">
+            </div>
+            <div class="password-form">
+                <div class="password-field">
+                    <label for="newPassword">新規パスワード</label>
+                    <input type="password" id="newPassword">
+                </div>
+                <div class="password-field">
+                    <label for="newPasswordConfirm">新規パスワード（確認）</label>
+                    <input type="password" id="newPasswordConfirm">
+                </div>
+                <button class="btn btn-password-submit" onclick="handlePasswordReset()">登録</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
+
+        <div id="emailReset" class="container-box email-reset page">
+            <h2>メールアドレス再設定</h2>
+            <div id="emailError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;">
+            </div>
+            <div class="email-form">
+                <div class="email-field">
+                    <label for="newEmail">新規メールアドレス</label>
+                    <input type="email" id="newEmail">
+                </div>
+                <div class="email-field">
+                    <label for="newEmailConfirm">新規メールアドレス（確認）</label>
+                    <input type="email" id="newEmailConfirm">
+                </div>
+                <button class="btn btn-email-submit" onclick="handleEmailReset()">登録</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <small>&copy; 2025 ManabiLink</small>
+        </div>
+    </footer>
+
+    <script src="index.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyARLYSR3o4RJ6Rt17qseGZhHoToLw5xyQk",
+            authDomain: "manabilink-26389.firebaseapp.com",
+            projectId: "manabilink-26389",
+            storageBucket: "manabilink-26389.firebasestorage.app",
+            messagingSenderId: "511559359273",
+            appId: "1:511559359273:web:b682b70196d13c5b50b538",
+            measurementId: "G-3BRCMSPNR8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+</body>
+
+</html>

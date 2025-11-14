@@ -1,135 +1,78 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>ManabiLink — ログイン</title>
-    <link rel="stylesheet" href="../index.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ManabiLink — ログイン</title>
+  <link rel="stylesheet" href="../index.css">
+  <style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
+    .login-container { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+    h2 { text-align: center; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.3rem; }
+    input { width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; }
+    .btn { width: 100%; padding: 0.7rem; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .btn:hover { background: #0056b3; }
+    .error-message { color: red; margin-bottom: 1rem; display: none; }
+    .link { text-align: center; margin-top: 1rem; }
+    .link a { color: #007bff; text-decoration: none; }
+    .link a:hover { text-decoration: underline; }
+  </style>
 </head>
+<body>
 
-<body class="font-medium">
-    <header class="site-header">
-        <div class="container">
-            <h1 class="logo">ManabiLink</h1>
-            <nav class="nav">
-                <a href="../">ホーム</a>
-            </nav>
-            <div class="hamburger" onclick="toggleMenu()">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-    </header>
-
-    <div id="menuBackdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
-    <div id="menuOverlay" class="menu-overlay">
-        <div class="menu-close" onclick="toggleMenu()">×</div>
-        <ul class="menu-items">
-            <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
-            <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
-            <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
-            <li onclick="alert('設定ページ（準備中）'); toggleMenu()">設定</li>
-            <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
-        </ul>
+  <div class="login-container">
+    <h2>ログイン</h2>
+    <div id="loginError" class="error-message"></div>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" id="email" required>
     </div>
+    <div class="form-group">
+      <label for="password">パスワード</label>
+      <input type="password" id="password" required>
+    </div>
+    <button class="btn" id="loginBtn">ログイン</button>
+    <div class="link">
+      登録していない場合は <a href="/register/index.html">こちら</a>
+    </div>
+  </div>
 
-    <main>
-        <div id="login" class="login-container page">
-            <h2>保護者ログイン</h2>
-            <div id="loginError" class="error-message" style="display: none;"></div>
-            <div class="form-group"><label for="email">メールアドレス</label><input type="email" id="email"></div>
-            <div class="form-group"><label for="password">パスワード</label><input type="password" id="password"></div>
-            <button class="btn btn-login" onclick="handleLogin()">ログイン</button>
-            <div class="link">
-                新規登録は <a class="link-btn" href="../register/">こちらから</a>
-            </div>
-            <div class="link">
-                <a class="link-btn" href="../">← ホームへ戻る</a>
-            </div>
-        </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
-        <div id="expertLogin" class="login-container page">
-            <h2>専門家ログイン</h2>
-            <div id="expertLoginError" class="error-message" style="display: none;"></div>
-            <div class="form-group"><label for="expertEmail">メールアドレス</label><input type="email" id="expertEmail"></div>
-            <div class="form-group"><label for="expertPassword">パスワード</label><input type="password" id="expertPassword">
-            </div>
-            <button class="btn btn-login" onclick="handleExpertLogin()">ログイン</button>
-            <div class="link">
-                専門家登録は <button class="link-btn" onclick="showPage('expertRegister')">こちらから</button>
-            </div>
-            <div class="link">
-                <a class="link-btn" href="../">← ホームへ戻る</a>
-            </div>
-        </div>
+    // Firebase初期化
+    const firebaseConfig = await (await fetch('/config.json')).json();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-        <div id="expertRegister" class="login-container page">
-            <h2>新規登録（専門家）</h2>
-            <div id="expertRegisterError" class="error-message" style="display: none;"></div>
-            <div class="form-group"><label for="expertName">お名前</label><input type="text" id="expertName"></div>
-            <div class="form-group"><label for="expertEmail2">メールアドレス</label><input type="email" id="expertEmail2">
-            </div>
-            <div class="form-group"><label for="expertPassword2">パスワード</label><input type="password" id="expertPassword2"></div>
-            <div class="form-group"><label for="expertPasswordConfirm">パスワード（確認）</label><input type="password" id="expertPasswordConfirm"></div>
-            <button class="btn btn-register" onclick="handleExpertRegister()">登録する</button>
-            <div class="link">
-                <a class="link-btn" href="./">← ログイン画面に戻る</a>
-            </div>
-        </div>
-    </main>
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
 
-    <footer class="site-footer">
-        <div class="container">
-            <small>&copy; 2025 ManabiLink</small>
-        </div>
-    </footer>
+    loginBtn.addEventListener('click', async () => {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
-    <script src="../index.js"></script>
-    <script type="module">
-        // Initialize Firebase same as root page so login/register pages work standalone.
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
-        import {
-            getAuth,
-            onAuthStateChanged,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut,
-            updatePassword,
-            updateEmail,
-            sendPasswordResetEmail,
-            updateProfile
-        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+      loginError.style.display = 'none';
 
-        async function initFirebase() {
-            try {
-                const res = await fetch('/config.json');
-                if (!res.ok) throw new Error('config.json not found');
-                const firebaseConfig = await res.json();
-                const app = initializeApp(firebaseConfig);
-                try { getAnalytics(app); } catch (e) { /* optional */ }
-                const auth = getAuth(app);
-                window.firebaseAuth = auth;
-                window.firebaseAPI = {
-                    createUserWithEmailAndPassword,
-                    signInWithEmailAndPassword,
-                    signOut,
-                    updatePassword,
-                    updateEmail,
-                    sendPasswordResetEmail,
-                    onAuthStateChanged,
-                    updateProfile
-                };
-                onAuthStateChanged(auth, user => {
-                    window.dispatchEvent(new CustomEvent('firebaseAuthChanged', { detail: user }));
-                });
-            } catch (e) {
-                console.warn('Firebase not initialized:', e.message);
-            }
-        }
+      if (!email || !password) {
+        loginError.textContent = "メールアドレスとパスワードを入力してください";
+        loginError.style.display = 'block';
+        return;
+      }
 
-        initFirebase();
-    </script>
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // ログイン成功 → ホームページへ遷移
+        window.location.href = "/index.html";
+      } catch (err) {
+        loginError.textContent = "メールアドレスまたはパスワードが正しくありません";
+        loginError.style.display = 'block';
+      }
+    });
+  </script>
+
 </body>
-
 </html>

@@ -35,13 +35,6 @@ function showPage(id) {
 
         // ページトップへスクロール
         window.scrollTo(0, 0);
-    } else {
-        // 要素がこのドキュメント内に無い場合は、別ファイルへ遷移する
-        if (id === 'login') { window.location.href = 'login/'; return; }
-        if (id === 'register') { window.location.href = 'register/'; return; }
-        if (id === 'home') { window.location.href = '/'; return; }
-        // その他は何もしない
-        return;
     }
 }
 

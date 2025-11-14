@@ -1,105 +1,99 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>ManabiLink — 新規登録（保護者）</title>
-    <link rel="stylesheet" href="../index.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ManabiLink — 新規登録</title>
+  <link rel="stylesheet" href="../index.css">
+  <style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
+    .register-container { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+    h2 { text-align: center; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.3rem; }
+    input { width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; }
+    .btn { width: 100%; padding: 0.7rem; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    .btn:hover { background: #218838; }
+    .error-message { color: red; margin-bottom: 1rem; display: none; }
+    .link { text-align: center; margin-top: 1rem; }
+    .link a { color: #007bff; text-decoration: none; }
+    .link a:hover { text-decoration: underline; }
+  </style>
 </head>
+<body>
 
-<body class="font-medium">
-    <header class="site-header">
-        <div class="container">
-            <h1 class="logo">ManabiLink</h1>
-            <nav class="nav">
-                <a href="../">ホーム</a>
-            </nav>
-            <div class="hamburger" onclick="toggleMenu()">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-    </header>
-
-    <div id="menuBackdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
-    <div id="menuOverlay" class="menu-overlay">
-        <div class="menu-close" onclick="toggleMenu()">×</div>
-        <ul class="menu-items">
-            <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
-            <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
-            <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
-            <li onclick="alert('設定ページ（準備中）'); toggleMenu()">設定</li>
-            <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
-        </ul>
+  <div class="register-container">
+    <h2>新規登録</h2>
+    <div id="registerError" class="error-message"></div>
+    <div class="form-group">
+      <label for="nickname">ニックネーム</label>
+      <input type="text" id="nickname" required>
     </div>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" id="email" required>
+    </div>
+    <div class="form-group">
+      <label for="password">パスワード</label>
+      <input type="password" id="password" required>
+    </div>
+    <div class="form-group">
+      <label for="passwordConfirm">パスワード（確認用）</label>
+      <input type="password" id="passwordConfirm" required>
+    </div>
+    <button class="btn" id="registerBtn">登録する</button>
+    <div class="link">
+      すでにアカウントをお持ちの場合は <a href="/login/index.html">ログイン</a>
+    </div>
+  </div>
 
-    <main>
-        <div id="register" class="login-container page">
-            <h2>新規登録（保護者）</h2>
-            <div id="registerError" class="error-message" style="display: none;"></div>
-            <div class="form-group"><label for="name">お名前</label><input type="text" id="name"></div>
-            <div class="form-group"><label for="email2">メールアドレス</label><input type="email" id="email2"></div>
-            <div class="form-group"><label for="password2">パスワード</label><input type="password" id="password2"></div>
-            <div class="form-group"><label for="passwordConfirm">パスワード（確認）</label><input type="password" id="passwordConfirm"></div>
-            <button class="btn btn-register" onclick="handleRegister()">登録する</button>
-            <div class="link">
-                <a class="link-btn" href="../login/">← ログイン画面に戻る</a>
-            </div>
-        </div>
-    </main>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
-    <footer class="site-footer">
-        <div class="container">
-            <small>&copy; 2025 ManabiLink</small>
-        </div>
-    </footer>
+    // Firebase 初期化
+    const firebaseConfig = await (await fetch('/config.json')).json();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    <script src="../index.js"></script>
-    <script type="module">
-        // Initialize Firebase same as root page so login/register pages work standalone.
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
-        import {
-            getAuth,
-            onAuthStateChanged,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut,
-            updatePassword,
-            updateEmail,
-            sendPasswordResetEmail,
-            updateProfile
-        } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    const registerBtn = document.getElementById('registerBtn');
+    const registerError = document.getElementById('registerError');
 
-        async function initFirebase() {
-            try {
-                const res = await fetch('/config.json');
-                if (!res.ok) throw new Error('config.json not found');
-                const firebaseConfig = await res.json();
-                const app = initializeApp(firebaseConfig);
-                try { getAnalytics(app); } catch (e) { /* optional */ }
-                const auth = getAuth(app);
-                window.firebaseAuth = auth;
-                window.firebaseAPI = {
-                    createUserWithEmailAndPassword,
-                    signInWithEmailAndPassword,
-                    signOut,
-                    updatePassword,
-                    updateEmail,
-                    sendPasswordResetEmail,
-                    onAuthStateChanged,
-                    updateProfile
-                };
-                onAuthStateChanged(auth, user => {
-                    window.dispatchEvent(new CustomEvent('firebaseAuthChanged', { detail: user }));
-                });
-            } catch (e) {
-                console.warn('Firebase not initialized:', e.message);
-            }
-        }
+    registerBtn.addEventListener('click', async () => {
+      const nickname = document.getElementById('nickname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const passwordConfirm = document.getElementById('passwordConfirm').value;
 
-        initFirebase();
-    </script>
+      registerError.style.display = 'none';
+
+      // 入力チェック
+      if (!nickname || !email || !password || !passwordConfirm) {
+        registerError.textContent = "全ての項目を入力してください";
+        registerError.style.display = 'block';
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        registerError.textContent = "パスワードが一致しません";
+        registerError.style.display = 'block';
+        return;
+      }
+
+      try {
+        // Firebase 新規登録
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // ニックネームを設定
+        await updateProfile(userCredential.user, { displayName: nickname });
+
+        alert('登録完了！ログイン画面に移動します');
+        window.location.href = "/login/index.html";
+      } catch (err) {
+        registerError.textContent = err.message;
+        registerError.style.display = 'block';
+      }
+    });
+  </script>
+
 </body>
-
 </html>

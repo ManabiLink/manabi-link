@@ -13,8 +13,8 @@
         <div class="container">
             <h1 class="logo">ManabiLink</h1>
             <nav class="nav">
-                <button onclick="alert('特徴ページへ遷移（準備中）')" style="margin-left: 0;">特徴</button>
-                <button onclick="alert('サービスについてページへ遷移（準備中）')">サービスについて</button>
+                <button onclick="location.href='feature/'" style="margin-left: 0;">特徴</button>
+                <button onclick="location.href='servce/'">サービスについて</button>
                 <button onclick="alert('お問い合わせフォームへ遷移（準備中）')">お問い合わせ</button>
             </nav>
             <div class="hamburger" onclick="toggleMenu()">
@@ -27,10 +27,10 @@
     <div id="menuOverlay" class="menu-overlay">
         <div class="menu-close" onclick="toggleMenu()">×</div>
         <ul class="menu-items">
-            <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
-            <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
+            <li onclick="location.href='carender/'; toggleMenu()">子供の成長記録</li>
+            <li onclick="location.href='learnig/'; toggleMenu()">読み聞かせページ</li>
             <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
-            <li onclick="alert('設定ページ（準備中）'); toggleMenu()">設定</li>
+            <li onclick="location.href='setting/'; toggleMenu()">設定</li>
             <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
         </ul>
     </div>
@@ -48,7 +48,7 @@
             <h2>ダッシュボード</h2>
             <div class="welcome-text"><span id="userName"></span>さん、ようこそ!</div>
             <div class="dashboard-content">
-                <div class="card" onclick="alert('保護者同士のコミュニケーション機能（準備中）')">
+                <div class="card" onclick="location.href='communication/'">
                     <div class="card-icon">👥</div>
                     <h3>保護者同士のコミュニケーション</h3>
                 </div>

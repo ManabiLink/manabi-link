@@ -17,18 +17,29 @@ let currentFontSize = 'medium';
 function showPage(id) {
     // 全ページを非表示 (activeクラスを削除)
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    // 指定ページを表示 (activeクラスを追加)
-    document.getElementById(id).classList.add('active');
-    
-    // エラーメッセージをクリア
-    const errorIds = ['loginError', 'registerError', 'expertLoginError', 'expertRegisterError', 'passwordError', 'emailError'];
-    errorIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
-    
-    // ページトップへスクロール
-    window.scrollTo(0, 0);
+    // 指定ページ要素を取得
+    const el = document.getElementById(id);
+    if (el) {
+        // 指定ページを表示 (activeクラスを追加)
+        el.classList.add('active');
+
+        // エラーメッセージをクリア
+        const errorIds = ['loginError', 'registerError', 'expertLoginError', 'expertRegisterError', 'passwordError', 'emailError'];
+        errorIds.forEach(id => {
+            const errEl = document.getElementById(id);
+            if (errEl) errEl.style.display = 'none';
+        });
+
+        // ページトップへスクロール
+        window.scrollTo(0, 0);
+    } else {
+        // 要素がこのドキュメント内に無い場合は、別ファイルへ遷移する
+        if (id === 'login') { window.location.href = 'login/'; return; }
+        if (id === 'register') { window.location.href = 'register/'; return; }
+        if (id === 'home') { window.location.href = '/'; return; }
+        // その他は何もしない
+        return;
+    }
 }
 
 function showError(elementId, message) {
@@ -162,8 +173,14 @@ function changeFontSize(size) {
 
 // 初期表示
 document.addEventListener('DOMContentLoaded', () => {
-    // ページロード時にhome画面を表示
-    showPage('home'); 
-    // 現在のフォントサイズボタンをアクティブに
+    // ページロード時の初期表示設定
+    if (document.getElementById('home')) {
+        showPage('home');
+    } else {
+        // ホームがなければ、このページ内の最初の .page を表示
+        const first = document.querySelector('.page');
+        if (first) first.classList.add('active');
+    }
+    // 現在のフォントサイズを適用
     changeFontSize(currentFontSize);
 });

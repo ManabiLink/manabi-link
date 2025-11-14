@@ -1,0 +1,68 @@
+<div id="settings" class="container-box settings page">
+            <h2>設定</h2>
+            <div class="settings-buttons">
+                <button class="settings-btn" onclick="alert('通知設定（準備中）')">通知設定</button>
+                <button class="settings-btn" onclick="showPage('fontSizeSettings')">文字の大きさ</button>
+                <button class="settings-btn" onclick="alert('アカウント管理（準備中）')">アカウント管理</button>
+                <button class="settings-btn" onclick="showPage('passwordReset')">パスワード再設定</button>
+                <button class="settings-btn" onclick="showPage('emailReset')">メールアドレス再設定</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('dashboard')">← ダッシュボードに戻る</button>
+            </div>
+        </div>
+
+        <div id="fontSizeSettings" class="container-box font-size-settings page">
+            <h2>文字の大きさ</h2>
+            <div class="font-size-options">
+                <span class="font-size-label">設定オプション</span>
+                <div class="font-size-buttons">
+                    <button class="font-btn small" onclick="changeFontSize('small')">小</button>
+                    <button class="font-btn medium active" onclick="changeFontSize('medium')">中</button>
+                    <button class="font-btn large" onclick="changeFontSize('large')">大</button>
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
+
+        <div id="passwordReset" class="container-box password-reset page">
+            <h2>パスワード再設定</h2>
+            <div id="passwordError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;">
+            </div>
+            <div class="password-form">
+                <div class="password-field">
+                    <label for="newPassword">新規パスワード</label>
+                    <input type="password" id="newPassword">
+                </div>
+                <div class="password-field">
+                    <label for="newPasswordConfirm">新規パスワード（確認）</label>
+                    <input type="password" id="newPasswordConfirm">
+                </div>
+                <button class="btn btn-password-submit" onclick="handlePasswordReset()">登録</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>
+
+        <div id="emailReset" class="container-box email-reset page">
+            <h2>メールアドレス再設定</h2>
+            <div id="emailError" class="error-message" style="display: none; max-width: 400px; margin: 0 auto 20px;">
+            </div>
+            <div class="email-form">
+                <div class="email-field">
+                    <label for="newEmail">新規メールアドレス</label>
+                    <input type="email" id="newEmail">
+                </div>
+                <div class="email-field">
+                    <label for="newEmailConfirm">新規メールアドレス（確認）</label>
+                    <input type="email" id="newEmailConfirm">
+                </div>
+                <button class="btn btn-email-submit" onclick="handleEmailReset()">登録</button>
+            </div>
+            <div style="margin-top: 30px;">
+                <button class="btn btn-login" onclick="showPage('settings')">← 設定に戻る</button>
+            </div>
+        </div>

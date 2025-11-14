@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ManabiLink — 新規登録（保護者）</title>
+    <link rel="stylesheet" href="../index.css">
+</head>
+
+<body class="font-medium">
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo">ManabiLink</h1>
+            <nav class="nav">
+                <a href="../">ホーム</a>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <div id="menuBackdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
+    <div id="menuOverlay" class="menu-overlay">
+        <div class="menu-close" onclick="toggleMenu()">×</div>
+        <ul class="menu-items">
+            <li onclick="alert('子供の成長記録（準備中）'); toggleMenu()">子供の成長記録</li>
+            <li onclick="alert('読み聞かせページ（準備中）'); toggleMenu()">読み聞かせページ</li>
+            <li onclick="alert('おとぎ話を読む（準備中）'); toggleMenu()">おとぎ話を読む</li>
+            <li onclick="alert('設定ページ（準備中）'); toggleMenu()">設定</li>
+            <li onclick="handleLogout(); toggleMenu()">ログアウト</li>
+        </ul>
+    </div>
+
+    <main>
+        <div id="register" class="login-container page">
+            <h2>新規登録（保護者）</h2>
+            <div id="registerError" class="error-message" style="display: none;"></div>
+            <div class="form-group"><label for="name">お名前</label><input type="text" id="name"></div>
+            <div class="form-group"><label for="email2">メールアドレス</label><input type="email" id="email2"></div>
+            <div class="form-group"><label for="password2">パスワード</label><input type="password" id="password2"></div>
+            <div class="form-group"><label for="passwordConfirm">パスワード（確認）</label><input type="password" id="passwordConfirm"></div>
+            <button class="btn btn-register" onclick="handleRegister()">登録する</button>
+            <div class="link">
+                <a class="link-btn" href="../login/">← ログイン画面に戻る</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <small>&copy; 2025 ManabiLink</small>
+        </div>
+    </footer>
+
+    <script src="../index.js"></script>
+</body>
+
+</html>

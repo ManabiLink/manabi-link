@@ -8,6 +8,9 @@ let experts = {
 let currentUser = null;  
 let currentExpert = null; 
 let currentFontSize = 'medium'; 
+// firebase 用の API は index.html の module スクリプト側で
+// `window.firebaseAuth` と `window.firebaseAPI` として設定されます。
+// 利用可能なら Firebase を使い、なければローカルの users/experts オブジェクトを使います.
 
 /* ==================== ページ遷移・UI制御 (最重要機能) ==================== */
 /**
@@ -50,6 +53,20 @@ function showError(elementId, message) {
     }
 }
 
+// Firebase 認証の状態変化を監視して UI を更新
+window.addEventListener('firebaseAuthChanged', (e) => {
+    const user = e.detail;
+    if (user) {
+        currentUser = { name: user.displayName || user.email };
+        const el = document.getElementById('userName'); if (el) el.textContent = currentUser.name;
+        showPage('dashboard');
+    } else {
+        currentUser = null;
+        const el = document.getElementById('userName'); if (el) el.textContent = '';
+        showPage('home');
+    }
+});
+
 function toggleMenu() {
     const menu = document.getElementById('menuOverlay');
     const backdrop = document.getElementById('menuBackdrop');
@@ -66,8 +83,26 @@ function handleRegister() {
 
     if (!name || !email || !password || !passwordConfirm) { showError('registerError', '入力していません'); return; }
     if (password !== passwordConfirm) { showError('registerError', 'パスワードが一致しません'); return; }
-    if (users[email]) { showError('registerError', 'このメールアドレスは既に登録されています'); return; }
 
+    // Firebase 利用可なら Firebase で登録
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.createUserWithEmailAndPassword) {
+        window.firebaseAPI.createUserWithEmailAndPassword(window.firebaseAuth, email, password)
+            .then(userCred => {
+                const fu = userCred.user;
+                // 表示名を設定
+                if (window.firebaseAPI.updateProfile) {
+                    window.firebaseAPI.updateProfile(fu, { displayName: name }).catch(() => {});
+                }
+                alert('保護者として登録が完了しました');
+                // 登録後はログインページへ遷移
+                window.location.href = '/login/';
+            })
+            .catch(err => { showError('registerError', err.message || '登録に失敗しました'); });
+        return;
+    }
+
+    // フォールバック: ローカルメモリ
+    if (users[email]) { showError('registerError', 'このメールアドレスは既に登録されています'); return; }
     users[email] = { name: name, password: password };
     alert('保護者として登録が完了しました');
     showPage('login');
@@ -76,8 +111,22 @@ function handleRegister() {
 function handleLogin() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-
     if (!email || !password) { showError('loginError', '入力していません'); return; }
+
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.signInWithEmailAndPassword) {
+        window.firebaseAPI.signInWithEmailAndPassword(window.firebaseAuth, email, password)
+            .then(userCred => {
+                const u = userCred.user;
+                currentUser = { name: u.displayName || u.email };
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                showPage('dashboard');
+            })
+            .catch(err => { showError('loginError', err.message || 'ログインに失敗しました'); });
+        return;
+    }
+
     if (!users[email] || users[email].password !== password) { showError('loginError', 'メールアドレスかパスワードが一致していません'); return; }
 
     currentUser = users[email];
@@ -95,11 +144,26 @@ function handleExpertRegister() {
 
     if (!name || !email || !password || !passwordConfirm) { showError('expertRegisterError', '入力していません'); return; }
     if (password !== passwordConfirm) { showError('expertRegisterError', 'パスワードが一致しません'); return; }
-    if (experts[email]) { showError('expertRegisterError', 'このメールアドレスは既に登録されています'); return; }
 
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.createUserWithEmailAndPassword) {
+        window.firebaseAPI.createUserWithEmailAndPassword(window.firebaseAuth, email, password)
+            .then(userCred => {
+                const fu = userCred.user;
+                if (window.firebaseAPI.updateProfile) {
+                    window.firebaseAPI.updateProfile(fu, { displayName: name }).catch(() => {});
+                }
+                alert('専門家として登録が完了しました');
+                showPage('expertLogin');
+            })
+            .catch(err => { showError('expertRegisterError', err.message || '登録に失敗しました'); });
+        return;
+    }
+
+    if (experts[email]) { showError('expertRegisterError', 'このメールアドレスは既に登録されています'); return; }
     experts[email] = { name: name, password: password };
     alert('専門家として登録が完了しました');
-    showPage('expertLogin');
+    // 登録後はログインページへ遷移
+    window.location.href = 'login/';
 }
 
 function handleExpertLogin() {
@@ -107,6 +171,18 @@ function handleExpertLogin() {
     const password = document.getElementById('expertPassword').value;
 
     if (!email || !password) { showError('expertLoginError', '入力していません'); return; }
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.signInWithEmailAndPassword) {
+        window.firebaseAPI.signInWithEmailAndPassword(window.firebaseAuth, email, password)
+            .then(userCred => {
+                const u = userCred.user;
+                currentExpert = { name: u.displayName || u.email };
+                alert(`専門家（${currentExpert.name}）としてログインしました（ホームへ戻ります）`);
+                showPage('home');
+            })
+            .catch(err => { showError('expertLoginError', err.message || 'ログインに失敗しました'); });
+        return;
+    }
+
     if (!experts[email] || experts[email].password !== password) { showError('expertLoginError', 'メールアドレスかパスワードが一致していません'); return; }
 
     currentExpert = experts[email];
@@ -115,6 +191,12 @@ function handleExpertLogin() {
 }
 
 function handleLogout() {
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.signOut) {
+        window.firebaseAPI.signOut(window.firebaseAuth).catch(()=>{}).finally(()=>{
+            currentUser = null; currentExpert = null; showPage('home');
+        });
+        return;
+    }
     currentUser = null;
     currentExpert = null;
     showPage('home');
@@ -128,6 +210,16 @@ function handlePasswordReset() {
     if (!newPassword || !newPasswordConfirm) { showError('passwordError', '入力していません'); return; }
     if (newPassword !== newPasswordConfirm) { showError('passwordError', 'パスワードが一致していません'); return; }
 
+    // Firebase があれば updatePassword を試す
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.updatePassword) {
+        const fu = window.firebaseAuth.currentUser;
+        if (!fu) { showError('passwordError', 'ログインが必要です'); return; }
+        window.firebaseAPI.updatePassword(fu, newPassword)
+            .then(()=>{ showError('passwordError', 'パスワードが変更されました'); showPage('settings'); })
+            .catch(err=>{ showError('passwordError', err.message || '変更に失敗しました'); });
+        return;
+    }
+
     // ユーザー情報の更新 (currentUserがいる前提)
     if (currentUser) {
         const userEmail = Object.keys(users).find(email => users[email] === currentUser);
@@ -135,7 +227,7 @@ function handlePasswordReset() {
             users[userEmail].password = newPassword;
             currentUser.password = newPassword;
         }
-    } 
+    }
 
     showError('passwordError', 'パスワードが変更されました');
     showPage('settings');
@@ -149,6 +241,15 @@ function handleEmailReset() {
     if (newEmail !== newEmailConfirm) { showError('emailError', 'メールアドレスが一致していません'); return; }
     if (users[newEmail]) { showError('emailError', 'このメールアドレスは既に使用されています'); return; }
 
+    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.updateEmail) {
+        const fu = window.firebaseAuth.currentUser;
+        if (!fu) { showError('emailError', 'ログインが必要です'); return; }
+        window.firebaseAPI.updateEmail(fu, newEmail)
+            .then(()=>{ showError('emailError', 'メールアドレスが変更されました'); showPage('settings'); })
+            .catch(err=>{ showError('emailError', err.message || '変更に失敗しました'); });
+        return;
+    }
+
     // ユーザー情報の更新 (currentUserがいる前提)
     if (currentUser) {
         const oldEmail = Object.keys(users).find(email => users[email] === currentUser);
@@ -156,7 +257,7 @@ function handleEmailReset() {
             users[newEmail] = users[oldEmail];
             delete users[oldEmail];
         }
-    } 
+    }
 
     showError('emailError', 'メールアドレスが変更されました');
     showPage('settings');

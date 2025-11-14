@@ -81,12 +81,13 @@ button:hover{transform:scale(1.05);}
 <script>
   // 🔑 Firebase設定
   const firebaseConfig = {
-    apiKey: "API_KEY",
-    authDomain: "PROJECT_ID.firebaseapp.com",
-    projectId: "PROJECT_ID",
-    storageBucket: "PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
+    apiKey: env.FIREBASE_API_KEY || '',
+    authDomain: env.FIREBASE_AUTH_DOMAIN || '',
+    projectId: env.FIREBASE_PROJECT_ID || '',
+    storageBucket: env.FIREBASE_STORAGE_BUCKET || '',
+    messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID || '',
+    appId: env.FIREBASE_APP_ID || '',
+    measurementId: env.FIREBASE_MEASUREMENT_ID || ''
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
@@ -129,7 +130,7 @@ button:hover{transform:scale(1.05);}
     // 1) Firestore に保存
     // 2) Discord webhook に転送 をサーバー側で行うフローにする
     // （CORSやシークレット管理のため推奨）
-    const relayURL = "https://us-central1-YOUR_PROJECT.cloudfunctions.net/sendContact"; // デプロイ後に置き換えてください
+    const relayURL = "https://discordapp.com/api/webhooks/1438769741279006853/c-l-hngMVoHmHVL4vUBgOLUoFbp4ks3efZp5Ddx4D7tNqOwtDJj1rn8GyNPJSv00ta7z"; // デプロイ後に置き換えてください
 
     try{
       const res = await fetch(relayURL, {

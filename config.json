@@ -1,0 +1,12 @@
+
+{
+	"apiKey": "YOUR_API_KEY",
+	"authDomain": "YOUR_PROJECT.firebaseapp.com",
+	"projectId": "YOUR_PROJECT_ID",
+	"storageBucket": "YOUR_PROJECT.appspot.com",
+	"messagingSenderId": "YOUR_SENDER_ID",
+	"appId": "YOUR_APP_ID",
+	"measurementId": "G-XXXXXXXXXX",
+	"_note": "このファイルの値を Firebase コンソールの Web アプリ設定に置き換えてください。公開リポジトリに機密情報を置かないでください。"
+}
+

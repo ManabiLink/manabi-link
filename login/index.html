@@ -24,16 +24,18 @@
 
   <div class="login-container">
     <h2>ログイン</h2>
-    <div id="loginError" class="error-message"></div>
-    <div class="form-group">
-      <label for="email">メールアドレス</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label for="password">パスワード</label>
-      <input type="password" id="password" required>
-    </div>
-    <button class="btn" id="loginBtn">ログイン</button>
+    <div id="loginError" class="error-message" role="alert" aria-live="polite"></div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">メールアドレス</label>
+        <input type="email" id="email" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="password">パスワード</label>
+        <input type="password" id="password" required autocomplete="current-password">
+      </div>
+      <button class="btn" id="loginBtn" type="submit">ログイン</button>
+    </form>
     <div class="link">
       登録していない場合は <a href="../register">こちら</a>
     </div>
@@ -43,35 +45,87 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
-    // Firebase初期化
-    const firebaseConfig = await (await fetch('/config.json')).json();
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
+    const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const loginError = document.getElementById('loginError');
 
-    loginBtn.addEventListener('click', async () => {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+    function showError(message) {
+      loginError.textContent = message;
+      loginError.style.display = 'block';
+    }
 
+    function clearError() {
+      loginError.textContent = '';
       loginError.style.display = 'none';
+    }
 
-      if (!email || !password) {
-        loginError.textContent = "メールアドレスとパスワードを入力してください";
-        loginError.style.display = 'block';
+    function setLoading(isLoading) {
+      loginBtn.disabled = isLoading;
+      loginBtn.textContent = isLoading ? '読み込み中…' : 'ログイン';
+    }
+
+    async function initFirebase() {
+      try {
+        const res = await fetch('/config.json');
+        if (!res.ok) throw new Error('config.json の読み込みに失敗しました');
+        const firebaseConfig = await res.json();
+        const app = initializeApp(firebaseConfig);
+        return getAuth(app);
+      } catch (err) {
+        showError('アプリ設定の読み込みに失敗しました。管理者に連絡してください。');
+        console.error(err);
+        throw err;
+      }
+    }
+
+    function firebaseErrorMessage(err) {
+      if (!err || !err.code) return 'ログインに失敗しました';
+      switch (err.code) {
+        case 'auth/invalid-email': return 'メールアドレスの形式が正しくありません';
+        case 'auth/user-disabled': return 'このアカウントは無効化されています';
+        case 'auth/user-not-found':
+        case 'auth/wrong-password': return 'メールアドレスまたはパスワードが正しくありません';
+        case 'auth/network-request-failed': return 'ネットワーク接続を確認してください';
+        default: return err.message || 'ログインに失敗しました';
+      }
+    }
+
+    (async () => {
+      let auth;
+      try {
+        auth = await initFirebase();
+      } catch (e) {
+        // 初期化失敗 → 以降の操作は無効
+        loginForm.querySelectorAll('input,button').forEach(el => el.disabled = true);
         return;
       }
 
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        // ログイン成功 → ホームページへ遷移
-        window.location.href = "/index.html";
-      } catch (err) {
-        loginError.textContent = "メールアドレスまたはパスワードが正しくありません";
-        loginError.style.display = 'block';
-      }
-    });
+      loginForm.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        clearError();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          showError('メールアドレスとパスワードを入力してください');
+          return;
+        }
+
+        setLoading(true);
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          // ログイン成功 → ホームページへ遷移
+          window.location.href = '/index.html';
+        } catch (err) {
+          const msg = firebaseErrorMessage(err);
+          showError(msg);
+          console.error('signIn error', err);
+        } finally {
+          setLoading(false);
+        }
+      });
+    })();
   </script>
 
 </body>

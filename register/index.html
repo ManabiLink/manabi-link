@@ -24,24 +24,26 @@
 
   <div class="register-container">
     <h2>新規登録</h2>
-    <div id="registerError" class="error-message"></div>
-    <div class="form-group">
-      <label for="nickname">ニックネーム</label>
-      <input type="text" id="nickname" required>
-    </div>
-    <div class="form-group">
-      <label for="email">メールアドレス</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label for="password">パスワード</label>
-      <input type="password" id="password" required>
-    </div>
-    <div class="form-group">
-      <label for="passwordConfirm">パスワード（確認用）</label>
-      <input type="password" id="passwordConfirm" required>
-    </div>
-    <button class="btn" id="registerBtn">登録する</button>
+    <div id="registerError" class="error-message" role="alert" aria-live="polite"></div>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="nickname">ニックネーム</label>
+        <input type="text" id="nickname" required autocomplete="nickname">
+      </div>
+      <div class="form-group">
+        <label for="email">メールアドレス</label>
+        <input type="email" id="email" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">パスワード</label>
+        <input type="password" id="password" required autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="passwordConfirm">パスワード（確認用）</label>
+        <input type="password" id="passwordConfirm" required autocomplete="new-password">
+      </div>
+      <button class="btn" id="registerBtn" type="submit">登録する</button>
+    </form>
     <div class="link">
       すでにアカウントをお持ちの場合は <a href="/login/index.html">ログイン</a>
     </div>
@@ -51,48 +53,94 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
-    // Firebase 初期化
-    const firebaseConfig = await (await fetch('/config.json')).json();
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
+    const registerForm = document.getElementById('registerForm');
     const registerBtn = document.getElementById('registerBtn');
     const registerError = document.getElementById('registerError');
 
-    registerBtn.addEventListener('click', async () => {
-      const nickname = document.getElementById('nickname').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const passwordConfirm = document.getElementById('passwordConfirm').value;
+    function showError(message) {
+      registerError.textContent = message;
+      registerError.style.display = 'block';
+    }
 
+    function clearError() {
+      registerError.textContent = '';
       registerError.style.display = 'none';
+    }
 
-      // 入力チェック
-      if (!nickname || !email || !password || !passwordConfirm) {
-        registerError.textContent = "全ての項目を入力してください";
-        registerError.style.display = 'block';
-        return;
-      }
+    function setLoading(isLoading) {
+      registerBtn.disabled = isLoading;
+      registerBtn.textContent = isLoading ? '登録中…' : '登録する';
+    }
 
-      if (password !== passwordConfirm) {
-        registerError.textContent = "パスワードが一致しません";
-        registerError.style.display = 'block';
-        return;
-      }
-
+    async function initFirebase() {
       try {
-        // Firebase 新規登録
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // ニックネームを設定
-        await updateProfile(userCredential.user, { displayName: nickname });
-
-        alert('登録完了！ログイン画面に移動します');
-        window.location.href = "/login/index.html";
+        const res = await fetch('/config.json');
+        if (!res.ok) throw new Error('config.json の読み込みに失敗しました');
+        const firebaseConfig = await res.json();
+        const app = initializeApp(firebaseConfig);
+        return getAuth(app);
       } catch (err) {
-        registerError.textContent = err.message;
-        registerError.style.display = 'block';
+        showError('アプリ設定の読み込みに失敗しました。管理者に連絡してください。');
+        console.error(err);
+        throw err;
       }
-    });
+    }
+
+    function firebaseErrorMessage(err) {
+      if (!err || !err.code) return '登録に失敗しました';
+      switch (err.code) {
+        case 'auth/email-already-in-use': return 'このメールアドレスは既に使用されています';
+        case 'auth/invalid-email': return 'メールアドレスの形式が正しくありません';
+        case 'auth/weak-password': return 'パスワードが短すぎます（6文字以上）';
+        case 'auth/network-request-failed': return 'ネットワーク接続を確認してください';
+        default: return err.message || '登録に失敗しました';
+      }
+    }
+
+    (async () => {
+      let auth;
+      try {
+        auth = await initFirebase();
+      } catch (e) {
+        // 初期化失敗 → 入力を無効化
+        registerForm.querySelectorAll('input,button').forEach(el => el.disabled = true);
+        return;
+      }
+
+      registerForm.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        clearError();
+
+        const nickname = document.getElementById('nickname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+        if (!nickname || !email || !password || !passwordConfirm) {
+          showError('全ての項目を入力してください');
+          return;
+        }
+
+        if (password !== passwordConfirm) {
+          showError('パスワードが一致しません');
+          return;
+        }
+
+        setLoading(true);
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(userCredential.user, { displayName: nickname });
+          alert('登録完了！ログイン画面に移動します');
+          window.location.href = '/login/index.html';
+        } catch (err) {
+          const msg = firebaseErrorMessage(err);
+          showError(msg);
+          console.error('register error', err);
+        } finally {
+          setLoading(false);
+        }
+      });
+    })();
   </script>
 
 </body>

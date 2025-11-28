@@ -1,3 +1,4 @@
 # Ignore local environment and generated config
 .env*
 config.json
+node_modules/

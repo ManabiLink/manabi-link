@@ -1,5 +1,5 @@
 /*
-npm install をターミナルに打って実行
+npm install express node-fetch@2 cors dotenv をターミナルに打って実行
 bitwarden を参考に、.env ファイルに すべてを貼り付け
 node server.js をターミナルに打って実行
 */
@@ -22,9 +22,9 @@ app.use(express.json());
 app.post("/api/webhook", async (req, res) => {
   const { title, kind, content, email, name } = req.body;
 
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  const webhookUrl = process.env.WEBHOOK_URL;
   if (!webhookUrl) {
-    return res.status(500).json({ error: "DISCORD_WEBHOOK_URL missing" });
+    return res.status(500).json({ error: "WEBHOOK_URL missing" });
   }
 
   const body = {

@@ -1,4 +1,6 @@
 /*
+npm install をターミナルに打って実行
+bitwarden を参考に、.env ファイルに すべてを貼り付け
 node server.js をターミナルに打って実行
 */
 const express = require("express");

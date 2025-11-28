@@ -1,3 +1,6 @@
+/*
+node server.js をターミナルに打って実行
+*/
 const express = require("express");
 const fetch = require("node-fetch");
 const cors = require("cors");
@@ -17,9 +20,9 @@ app.use(express.json());
 app.post("/api/webhook", async (req, res) => {
   const { title, kind, content, email, name } = req.body;
 
-  const webhookUrl = process.env.WEBHOOK_URL;
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) {
-    return res.status(500).json({ error: "WEBHOOK_URL missing" });
+    return res.status(500).json({ error: "DISCORD_WEBHOOK_URL missing" });
   }
 
   const body = {

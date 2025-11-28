@@ -73,87 +73,46 @@ button:hover{transform:scale(1.05);}
   </form>
 </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
-
 <script>
-  // 🔑 Firebase設定
-  const firebaseConfig = {
-    apiKey: env.FIREBASE_API_KEY || '',
-    authDomain: env.FIREBASE_AUTH_DOMAIN || '',
-    projectId: env.FIREBASE_PROJECT_ID || '',
-    storageBucket: env.FIREBASE_STORAGE_BUCKET || '',
-    messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID || '',
-    appId: env.FIREBASE_APP_ID || '',
-    measurementId: env.FIREBASE_MEASUREMENT_ID || ''
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
-
-  // 認証状態の監視
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      console.log('ログイン中:', user.email);
-      document.querySelectorAll('.auth-required').forEach(el => el.style.display = 'block');
-      document.querySelectorAll('.auth-anonymous').forEach(el => el.style.display = 'none');
-    } else {
-      console.log('未ログイン');
-      document.querySelectorAll('.auth-required').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.auth-anonymous').forEach(el => el.style.display = 'block');
-    }
-  });
-
   const form = document.getElementById('form');
   const feedback = document.getElementById('feedback');
 
-  // 🔔 Discord Webhook URL
-  const webhookURL = "https://discordapp.com/api/webhooks/1433692231688257638/oxlgPYE7yzSLqJk69zorMCHch6wEtty1CMcT9kM6348bAi-vwwaKsiConXhmKxGZQkn1";
-
-  form.addEventListener('submit', async (e)=>{
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    feedback.textContent="";
+    feedback.textContent = "";
 
     const data = {
       title: document.getElementById('title').value,
       kind: document.getElementById('kind').value,
       content: document.getElementById('content').value,
       email: document.getElementById('email').value,
-      name: document.getElementById('name').value || "匿名",
-      timestamp: new Date()
-    
+      name: document.getElementById('name').value || "匿名"
     };
 
-    // サーバー側（Cloud Function等）へ送信して
-    // 1) Firestore に保存
-    // 2) Discord webhook に転送 をサーバー側で行うフローにする
-    // （CORSやシークレット管理のため推奨）
-    const relayURL = "https://discordapp.com/api/webhooks/1438769741279006853/c-l-hngMVoHmHVL4vUBgOLUoFbp4ks3efZp5Ddx4D7tNqOwtDJj1rn8GyNPJSv00ta7z"; // デプロイ後に置き換えてください
+    const relayURL = "http://localhost:3000/api/webhook";
 
-    try{
+    try {
       const res = await fetch(relayURL, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
-      if(res.ok){
+
+      if (res.ok) {
         feedback.style.color = "#ff69b4";
-        feedback.textContent = "♡ 送信完了！Firebase＆Discordに届いたよ ♡";
+        feedback.textContent = "♡ 送信完了！Discordに届いたよ ♡";
         form.reset();
-      }else{
-        const text = await res.text();
-        console.error('relay error', res.status, text);
+      } else {
         feedback.style.color = "#e33";
-        feedback.textContent = "サーバー経由での通知に失敗しました💦";
+        feedback.textContent = "サーバー通知に失敗しました💦";
       }
-    }catch(err){
+    } catch (err) {
       feedback.style.color = "#e33";
       feedback.textContent = "通信エラーが発生しました💦";
       console.error(err);
     }
   });
 </script>
+
 </body>
 </html>

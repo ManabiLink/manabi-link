@@ -1,12 +1,11 @@
 
 {
-	"apiKey": "YOUR_API_KEY",
-	"authDomain": "YOUR_PROJECT.firebaseapp.com",
-	"projectId": "YOUR_PROJECT_ID",
-	"storageBucket": "YOUR_PROJECT.appspot.com",
-	"messagingSenderId": "YOUR_SENDER_ID",
-	"appId": "YOUR_APP_ID",
-	"measurementId": "G-XXXXXXXXXX",
+	"apiKey": "AIzaSyARLYSR3o4RJ6Rt17qseGZhHoToLw5xyQk",
+	"authDomain": "manabilink-26389.firebaseapp.com",
+	"projectId": "manabilink-26389",
+	"storageBucket": "manabilink-26389.firebasestorage.app",
+	"messagingSenderId": "511559359273",
+	"appId": "1:511559359273:web:b682b70196d13c5b50b538",
+	"measurementId": "G-3BRCMSPNR8",
 	"_note": "このファイルの値を Firebase コンソールの Web アプリ設定に置き換えてください。公開リポジトリに機密情報を置かないでください。"
 }
-

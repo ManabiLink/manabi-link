@@ -44,8 +44,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const registerForm = document.getElementById('registerForm');
     const registerBtn = document.getElementById('registerBtn');
@@ -66,13 +65,15 @@
       registerBtn.textContent = isLoading ? '登録中…' : '登録する';
     }
 
-    async function initFirebase() {
+    async function initSupabase() {
       try {
         const res = await fetch('/config.json');
         if (!res.ok) throw new Error('config.json の読み込みに失敗しました');
-        const firebaseConfig = await res.json();
-        const app = initializeApp(firebaseConfig);
-        return getAuth(app);
+        const supabaseConfig = await res.json();
+        if (!supabaseConfig.supabaseUrl || !supabaseConfig.supabaseAnonKey) {
+          throw new Error('Supabase 設定が正しくありません');
+        }
+        return createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabaseAnonKey);
       } catch (err) {
         showError('アプリ設定の読み込みに失敗しました。管理者に連絡してください。');
         console.error(err);
@@ -80,21 +81,18 @@
       }
     }
 
-    function firebaseErrorMessage(err) {
+    function supabaseErrorMessage(err) {
       if (!err || !err.code) return '登録に失敗しました';
       switch (err.code) {
-        case 'auth/email-already-in-use': return 'このメールアドレスは既に使用されています';
-        case 'auth/invalid-email': return 'メールアドレスの形式が正しくありません';
-        case 'auth/weak-password': return 'パスワードが短すぎます（6文字以上）';
-        case 'auth/network-request-failed': return 'ネットワーク接続を確認してください';
+        case 'email_address_already_registered': return 'このメールアドレスは既に使用されています';
         default: return err.message || '登録に失敗しました';
       }
     }
 
     (async () => {
-      let auth;
+      let supabase;
       try {
-        auth = await initFirebase();
+        supabase = await initSupabase();
       } catch (e) {
         // 初期化失敗 → 入力を無効化
         registerForm.querySelectorAll('input,button').forEach(el => el.disabled = true);
@@ -122,12 +120,18 @@
 
         setLoading(true);
         try {
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          await updateProfile(userCredential.user, { displayName: nickname });
-          alert('登録完了！ログイン画面に移動します');
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { display_name: nickname }
+            }
+          });
+          if (error) throw error;
+          alert('登録完了！メールを確認して認証を完了してください。その後ログイン画面に移動してください。');
           window.location.href = '/login/index.html';
         } catch (err) {
-          const msg = firebaseErrorMessage(err);
+          const msg = supabaseErrorMessage(err);
           showError(msg);
           console.error('register error', err);
         } finally {

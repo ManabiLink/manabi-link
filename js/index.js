@@ -8,9 +8,8 @@ let experts = {
 let currentUser = null;  
 let currentExpert = null; 
 let currentFontSize = 'medium'; 
-// firebase 用の API は index.html の module スクリプト側で
-// `window.firebaseAuth` と `window.firebaseAPI` として設定されます。
-// 利用可能なら Firebase を使い、なければローカルの users/experts オブジェクトを使います.
+// 認証バックエンドとして Supabase を利用します（/js/module.js で初期化）。
+// Supabase が利用できない場合のみローカルの users/experts オブジェクトをフォールバックとして使用します。
 
 /* ==================== ページ遷移・UI制御 (最重要機能) ==================== */
 /**
@@ -46,8 +45,8 @@ function showError(elementId, message) {
     }
 }
 
-// Firebase 認証の状態変化を監視して UI を更新
-window.addEventListener('firebaseAuthChanged', (e) => {
+// Supabase 認証の状態変化を監視して UI を更新
+window.addEventListener('supabaseAuthChanged', (e) => {
     const user = e.detail;
     if (user) {
         currentUser = { name: user.displayName || user.email };
@@ -77,20 +76,24 @@ function handleRegister() {
     if (!name || !email || !password || !passwordConfirm) { showError('registerError', '入力していません'); return; }
     if (password !== passwordConfirm) { showError('registerError', 'パスワードが一致しません'); return; }
 
-    // Firebase 利用可なら Firebase で登録
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.createUserWithEmailAndPassword) {
-        window.firebaseAPI.createUserWithEmailAndPassword(window.firebaseAuth, email, password)
-            .then(userCred => {
-                const fu = userCred.user;
-                // 表示名を設定
-                if (window.firebaseAPI.updateProfile) {
-                    window.firebaseAPI.updateProfile(fu, { displayName: name }).catch(() => {});
-                }
-                alert('保護者として登録が完了しました');
-                // 登録後はログインページへ遷移
+    // Supabase 利用可なら Supabase で登録
+    if (window.supabase) {
+        (async () => {
+            try {
+                const { data, error } = await window.supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { display_name: name }
+                    }
+                });
+                if (error) throw error;
+                alert('保護者として登録が完了しました。メールを確認して認証を完了してください。');
                 window.location.href = '/login/';
-            })
-            .catch(err => { showError('registerError', err.message || '登録に失敗しました'); });
+            } catch (err) {
+                showError('registerError', err.message || '登録に失敗しました');
+            }
+        })();
         return;
     }
 
@@ -106,17 +109,21 @@ function handleLogin() {
     const password = document.getElementById('password').value;
     if (!email || !password) { showError('loginError', '入力していません'); return; }
 
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.signInWithEmailAndPassword) {
-        window.firebaseAPI.signInWithEmailAndPassword(window.firebaseAuth, email, password)
-            .then(userCred => {
-                const u = userCred.user;
-                currentUser = { name: u.displayName || u.email };
+    if (window.supabase) {
+        (async () => {
+            try {
+                const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                const u = data.user;
+                currentUser = { name: (u.user_metadata && (u.user_metadata.display_name || u.user_metadata.full_name)) || u.email };
                 document.getElementById('userName').textContent = currentUser.name;
                 document.getElementById('email').value = '';
                 document.getElementById('password').value = '';
                 showPage('dashboard');
-            })
-            .catch(err => { showError('loginError', err.message || 'ログインに失敗しました'); });
+            } catch (err) {
+                showError('loginError', err.message || 'ログインに失敗しました');
+            }
+        })();
         return;
     }
 
@@ -138,17 +145,23 @@ function handleExpertRegister() {
     if (!name || !email || !password || !passwordConfirm) { showError('expertRegisterError', '入力していません'); return; }
     if (password !== passwordConfirm) { showError('expertRegisterError', 'パスワードが一致しません'); return; }
 
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.createUserWithEmailAndPassword) {
-        window.firebaseAPI.createUserWithEmailAndPassword(window.firebaseAuth, email, password)
-            .then(userCred => {
-                const fu = userCred.user;
-                if (window.firebaseAPI.updateProfile) {
-                    window.firebaseAPI.updateProfile(fu, { displayName: name }).catch(() => {});
-                }
-                alert('専門家として登録が完了しました');
+    if (window.supabase) {
+        (async () => {
+            try {
+                const { data, error } = await window.supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { display_name: name, role: 'expert' }
+                    }
+                });
+                if (error) throw error;
+                alert('専門家として登録が完了しました。メールを確認して認証を完了してください');
                 showPage('expertLogin');
-            })
-            .catch(err => { showError('expertRegisterError', err.message || '登録に失敗しました'); });
+            } catch (err) {
+                showError('expertRegisterError', err.message || '登録に失敗しました');
+            }
+        })();
         return;
     }
 
@@ -164,15 +177,19 @@ function handleExpertLogin() {
     const password = document.getElementById('expertPassword').value;
 
     if (!email || !password) { showError('expertLoginError', '入力していません'); return; }
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.signInWithEmailAndPassword) {
-        window.firebaseAPI.signInWithEmailAndPassword(window.firebaseAuth, email, password)
-            .then(userCred => {
-                const u = userCred.user;
-                currentExpert = { name: u.displayName || u.email };
+    if (window.supabase) {
+        (async () => {
+            try {
+                const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                const u = data.user;
+                currentExpert = { name: (u.user_metadata && (u.user_metadata.display_name || u.user_metadata.full_name)) || u.email };
                 alert(`専門家（${currentExpert.name}）としてログインしました（ホームへ戻ります）`);
                 showPage('home');
-            })
-            .catch(err => { showError('expertLoginError', err.message || 'ログインに失敗しました'); });
+            } catch (err) {
+                showError('expertLoginError', err.message || 'ログインに失敗しました');
+            }
+        })();
         return;
     }
 
@@ -184,10 +201,15 @@ function handleExpertLogin() {
 }
 
 function handleLogout() {
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.signOut) {
-        window.firebaseAPI.signOut(window.firebaseAuth).catch(()=>{}).finally(()=>{
-            currentUser = null; currentExpert = null; showPage('home');
-        });
+    if (window.supabase) {
+        (async () => {
+            try {
+                await window.supabase.auth.signOut();
+            } catch (e) {
+            } finally {
+                currentUser = null; currentExpert = null; showPage('home');
+            }
+        })();
         return;
     }
     currentUser = null;
@@ -203,13 +225,18 @@ function handlePasswordReset() {
     if (!newPassword || !newPasswordConfirm) { showError('passwordError', '入力していません'); return; }
     if (newPassword !== newPasswordConfirm) { showError('passwordError', 'パスワードが一致していません'); return; }
 
-    // Firebase があれば updatePassword を試す
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.updatePassword) {
-        const fu = window.firebaseAuth.currentUser;
-        if (!fu) { showError('passwordError', 'ログインが必要です'); return; }
-        window.firebaseAPI.updatePassword(fu, newPassword)
-            .then(()=>{ showError('passwordError', 'パスワードが変更されました'); showPage('settings'); })
-            .catch(err=>{ showError('passwordError', err.message || '変更に失敗しました'); });
+    // Supabase があれば updateUser を試す
+    if (window.supabase) {
+        (async () => {
+            try {
+                const { error } = await window.supabase.auth.updateUser({ password: newPassword });
+                if (error) throw error;
+                showError('passwordError', 'パスワードが変更されました');
+                showPage('settings');
+            } catch (err) {
+                showError('passwordError', err.message || '変更に失敗しました');
+            }
+        })();
         return;
     }
 
@@ -234,12 +261,17 @@ function handleEmailReset() {
     if (newEmail !== newEmailConfirm) { showError('emailError', 'メールアドレスが一致していません'); return; }
     if (users[newEmail]) { showError('emailError', 'このメールアドレスは既に使用されています'); return; }
 
-    if (window.firebaseAuth && window.firebaseAPI && window.firebaseAPI.updateEmail) {
-        const fu = window.firebaseAuth.currentUser;
-        if (!fu) { showError('emailError', 'ログインが必要です'); return; }
-        window.firebaseAPI.updateEmail(fu, newEmail)
-            .then(()=>{ showError('emailError', 'メールアドレスが変更されました'); showPage('settings'); })
-            .catch(err=>{ showError('emailError', err.message || '変更に失敗しました'); });
+    if (window.supabase) {
+        (async () => {
+            try {
+                const { error } = await window.supabase.auth.updateUser({ email: newEmail });
+                if (error) throw error;
+                showError('emailError', 'メールアドレスが変更されました');
+                showPage('settings');
+            } catch (err) {
+                showError('emailError', err.message || '変更に失敗しました');
+            }
+        })();
         return;
     }
 

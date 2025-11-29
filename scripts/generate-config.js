@@ -24,17 +24,12 @@ for (const line of lines) {
   env[key] = val;
 }
 
-// Map env vars to firebase config structure
-const firebaseConfig = {
-  apiKey: env.FIREBASE_API_KEY || '',
-  authDomain: env.FIREBASE_AUTH_DOMAIN || '',
-  projectId: env.FIREBASE_PROJECT_ID || '',
-  storageBucket: env.FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: env.FIREBASE_APP_ID || '',
-  measurementId: env.FIREBASE_MEASUREMENT_ID || ''
+// Map env vars to Supabase config structure
+const supabaseConfig = {
+  supabaseUrl: env.SUPABASE_URL || '',
+  supabaseAnonKey: env.SUPABASE_ANON_KEY || ''
 };
 
 const outPath = path.resolve(process.cwd(), 'config.json');
-fs.writeFileSync(outPath, JSON.stringify(firebaseConfig, null, 2), 'utf8');
+fs.writeFileSync(outPath, JSON.stringify(supabaseConfig, null, 2), 'utf8');
 console.log('Wrote', outPath);

@@ -12,27 +12,31 @@ git pull origin main --force
 
 ## 環境変数の設定
 
-環境変数は `.env` ファイルに設定します。以下は必要なKEYとなっています。
+このプロジェクトでは機密情報をリポジトリに含めないため、`.env.local`（ローカル専用）を使って環境変数を設定してください。リポジトリにはテンプレートとして `.env.example` を用意しています（`SUPABASE_*` と `DISCORD_WEBHOOK_URL` のみ）。
 
-```markdown
-# 機密情報のため、必要な情報は bitwarden に記載してあります。
-# firebase
-apiKey=
-authDomain=
-projectId=
-storageBucket=
-messagingSenderId=
-appId=
-measurementId=
+手順:
 
-# supabase
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-SUPABASE_ANON_KEY=
 
-# discord-toExpert
-DISCORD_WEBHOOK_URL=
+1. `.env.example` をコピーして `.env.local` を作成します:
+
+```bash
+cp .env.example .env.local
 ```
+
+1. `.env.local` に Supabase と Discord webhook の値を入れてください:
+
+```dotenv
+SUPABASE_URL=your-supabase-url
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+```
+
+注意:
+
+- 既存の Firebase の設定が手元にある場合でも、現在の Next.js 移行では Supabase を主要バックエンドとして利用します。Firebase のキーは `.env.local` に残したくない場合は削除してください（バックアップは別途管理してください）。
+- `.env.local` やその他のシークレットはコミットしないでください。`.gitignore` に `.env*` が既に含まれています。
+
 
 ## `server.js` の起動
 

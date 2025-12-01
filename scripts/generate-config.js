@@ -30,6 +30,8 @@ const supabaseConfig = {
   supabaseAnonKey: env.SUPABASE_ANON_KEY || ''
 };
 
-const outPath = path.resolve(process.cwd(), 'config.json');
+const outDir = path.resolve(process.cwd(), 'public');
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+const outPath = path.resolve(outDir, 'config.json');
 fs.writeFileSync(outPath, JSON.stringify(supabaseConfig, null, 2), 'utf8');
 console.log('Wrote', outPath);

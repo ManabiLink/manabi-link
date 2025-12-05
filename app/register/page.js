@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { getSupabase } from '@/lib/getSupabase';
 
 export default function Page(){
@@ -37,6 +38,7 @@ export default function Page(){
 
   return (
     <div className="p-6 max-w-xl mx-auto">
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <h2 className="text-2xl font-bold mb-4">新規登録</h2>
       {error && <div role="alert" className="mb-4 text-red-600">{error}</div>}
       <form onSubmit={onSubmit}>

@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const categories = {
   general: { label: '日々の悩み', color: 'bg-pink-100 text-pink-800' },
@@ -75,6 +76,7 @@ export default function Page(){
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <div className="bg-white rounded-2xl shadow p-6 mb-6">
         <h1 className="text-2xl font-bold text-pink-600">保護者のための安心掲示板</h1>
         <p className="text-gray-600">匿名で安心して相談・共有できる場所です（すべての投稿と返信は誰でも見られます）</p>

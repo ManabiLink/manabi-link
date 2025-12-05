@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 
 const INITIAL = [
   { id: '1', title: '子どもの集中力を高めるヒント', content: '集中力は学習の基礎です。適切な環境づくり、休憩時間の確保、興味を引く学習方法など、家庭でできる工夫をご紹介します。定期的な休憩を取ることで、長期的な集中力の維持につながります。', views: 125, likes: 45, timestamp: Date.now() - 7 * 24 * 60 * 60 * 1000 },
@@ -82,6 +83,7 @@ export default function Page() {
   return (
     <div className="p-6">
       <div className="max-w-5xl mx-auto">
+        <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
         <div className="bg-white p-6 rounded-lg shadow mb-6 text-center">
           <div style={{fontSize:40}}>🖼️</div>
           <h1 className="text-2xl font-bold">保護者の方におすすめの記事</h1>

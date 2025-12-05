@@ -5,6 +5,7 @@ import Link from 'next/link';
 export default function Page(){
   return (
     <div className="p-8 min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100">
+      <Link href="/" className="absolute top-6 left-6 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <div className="container max-w-3xl text-center bg-white rounded-3xl p-12 shadow-lg">
         <h1 className="text-4xl font-light mb-10">学習ページ</h1>
         <div className="flex flex-wrap justify-center gap-8">

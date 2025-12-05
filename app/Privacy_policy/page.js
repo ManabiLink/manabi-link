@@ -1,5 +1,6 @@
 "use client"
 import React from 'react';
+import Link from 'next/link';
 
 const jsonLd = `{
   "@context": "https://schema.org",
@@ -13,6 +14,7 @@ const jsonLd = `{
 export default function Page(){
   return (
     <div className="p-6 max-w-4xl mx-auto text-gray-900">
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <header className="border-b pb-3 mb-4">
         <h1 className="text-2xl font-bold">プライバシーポリシー</h1>
         <div className="text-sm text-gray-600">制定日: 2025年11月28日</div>

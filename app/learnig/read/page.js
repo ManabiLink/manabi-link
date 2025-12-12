@@ -100,7 +100,7 @@ export default function ReadPage() {
           <h1 className="text-2xl text-center text-indigo-600 mb-6">📚 読み聞かせページ 📖</h1>
 
         <div className="mb-4">
-          <select className="w-full p-3 border rounded-lg" value={storyKey} onChange={(e)=>setStoryKey(e.target.value)}>
+          <select className="w-full p-3 border rounded-lg" value={storyKey} onChange={(e) => setStoryKey(e.target.value)}>
             <option value="momotaro">桃太郎</option>
             <option value="kintaro">金太郎</option>
             <option value="kaguyahime">かぐや姫</option>
@@ -116,7 +116,7 @@ export default function ReadPage() {
 
         <div className="flex items-center gap-4 mb-4">
           <label className="font-bold">速度:</label>
-          <input type="range" min="0.5" max="2" step="0.1" value={rate} onChange={(e)=>setRate(parseFloat(e.target.value))} />
+          <input type="range" min="0.5" max="2" step="0.1" value={rate} onChange={(e) => setRate(parseFloat(e.target.value))} />
           <div className="text-indigo-600 font-medium">{rate.toFixed(1)}x</div>
         </div>
 
@@ -124,7 +124,7 @@ export default function ReadPage() {
           <div className="text-xl font-bold text-center text-indigo-600 mb-4">{STORIES[storyKey].title}</div>
           <div>
             {sentences.map((s, i) => (
-              <span key={i} className={`sentence ${i===index && isReading ? 'reading font-bold bg-yellow-200' : ''}`} data-index={i}>
+              <span key={i} className={`sentence ${i === index && isReading ? 'reading font-bold bg-yellow-200' : ''}`} data-index={i}>
                 {s}
               </span>
             ))}

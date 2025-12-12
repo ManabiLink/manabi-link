@@ -1,4 +1,22 @@
+
 {
   "supabaseUrl": "https://hbsxbgrubpqeflrqxykq.supabase.co",
-  "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhic3hiZ3J1YnBxZWZscnF4eWtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMzc2NzEsImV4cCI6MjA3OTkxMzY3MX0.o2y0Uo7SWtIZgHlYs9LgkAmYRi9bTnfqknO1uNT0SDo"
+  "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhic3hiZ3J1YnBxZWZscnF4eWtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMzc2NzEsImV4cCI6MjA3OTkxMzY3MX0.o2y0Uo7SWtIZgHlYs9LgkAmYRi9bTnfqknO1uNT0SDo",
+  "firebase": {
+    "apiKey": "AIzaSyARLYSR3o4RJ6Rt17qseGZhHoToLw5xyQk",
+    "authDomain": "manabilink-26389.firebaseapp.com",
+    "projectId": "manabilink-26389",
+    "storageBucket": "manabilink-26389.firebasestorage.app",
+    "messagingSenderId": "511559359273",
+    "appId": "1:511559359273:web:b682b70196d13c5b50b538",
+    "measurementId": "G-3BRCMSPNR8"
+  },
+  "supabaseServer": {
+    "url": "https://hbsxbgrubpqeflrqxykq.supabase.co",
+    "serviceRoleKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhic3hiZ3J1YnBxZWZscnF4eWtxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDMzNzY3MSwiZXhwIjoyMDc5OTEzNjcxfQ.CGFT3t9SDLyvpT5G8Ea1sI_16CkHIVdtO_tAauCPDKw",
+    "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhic3hiZ3J1YnBxZWZscnF4eWtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMzc2NzEsImV4cCI6MjA3OTkxMzY3MX0.o2y0Uo7SWtIZgHlYs9LgkAmYRi9bTnfqknO1uNT0SDo"
+  },
+  "discord": {
+    "webhookUrl": "https://discord.com/api/webhooks/1443829982982836314/KpRbJSQUxUPUkqx1HvXRjR-F8BCcZ2Nf6pZmwwG8si8kR-18DVgasIioaWaTIdZO2R5M"
+  }
 }

@@ -53,6 +53,7 @@ export default function Nav(){
             <div className="flex items-center gap-3">
               <Link href="/login" className="text-sm text-gray-700">ログイン</Link>
               <Link href="/register" className="text-sm text-pink-600">登録</Link>
+              <Link href="/setting" className="text-sm text-pink-600">設定</Link>
             </div>
           )}
         </nav>

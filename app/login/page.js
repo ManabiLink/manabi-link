@@ -1,408 +1,399 @@
+'use client'
+
 import React, { useState } from 'react';
-import { X, ArrowLeft } from 'lucide-react';
+import { getSupabase } from '@/lib/getSupabase';
+import { useRouter } from 'next/navigation';
 
-export default function SettingsModal() {
-  const [isOpen, setIsOpen] = useState(true);
-  const [currentScreen, setCurrentScreen] = useState('menu'); // 'menu', 'password', 'email', 'terms'
-  const [fontSize, setFontSize] = useState('medium');
-  
-  // パスワード再設定用の状態
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+export default function LoginPage() {
+    const router = useRouter();
+    const [currentPage, setCurrentPage] = useState('login');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('info');
 
-  // メールアドレス再設定用の状態
-  const [emailData, setEmailData] = useState({
-    currentEmail: '',
-    newEmail: '',
-    password: ''
-  });
+    const [loading, setLoading] = useState(false);
 
-  const handleLogout = () => {
-    if (window.confirm('ログアウトしますか？')) {
-      alert('ログアウトしました');
-      setIsOpen(false);
-    }
-  };
+    // Supabase クライアントは `getSupabase()` で取得（public/config.json を使用）
 
-  const handlePasswordSubmit = () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('新しいパスワードが一致しません');
-      return;
-    }
-    if (passwordData.newPassword.length < 8) {
-      alert('パスワードは8文字以上で設定してください');
-      return;
-    }
-    alert('パスワードを変更しました');
-    setCurrentScreen('menu');
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  };
 
-  const handleEmailSubmit = () => {
-    if (!emailData.currentEmail || !emailData.newEmail || !emailData.password) {
-      alert('すべての項目を入力してください');
-      return;
-    }
-    alert('確認メールを送信しました。新しいメールアドレスで確認してください。');
-    setCurrentScreen('menu');
-    setEmailData({ currentEmail: '', newEmail: '', password: '' });
-  };
+    // 以下、同じコード...
+    const showMessage = (text, type = 'info') => {
+        setMessage(text);
+        setMessageType(type);
+    };
 
-  const fontSizeClass = {
-    small: 'text-sm',
-    medium: 'text-base',
-    large: 'text-lg'
-  };
+    const handleLogin = async () => {
+        if (!email || !password) {
+            showMessage('メールアドレスとパスワードを入力してください', 'error');
+            return;
+        }
 
-  if (!isOpen) {
+        setLoading(true);
+        try {
+            const supabase = await getSupabase();
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+            if (error) {
+                showMessage(error.message || 'ログインに失敗しました', 'error');
+            } else {
+                showMessage('ログインしました!', 'success');
+                console.log('Session:', data.session);
+                // ログイン成功時にトップへリダイレクト
+                router.push('/');
+            }
+        } catch (error) {
+            showMessage('ログイン中にエラーが発生しました', 'error');
+            console.error('Login error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRegister = async () => {
+        if (!nickname || !email || !password || !confirmPassword) {
+            showMessage('すべての項目を入力してください', 'error');
+            return;
+        }
+        if (password !== confirmPassword) {
+            showMessage('パスワードが一致しません', 'error');
+            return;
+        }
+        if (password.length < 6) {
+            showMessage('パスワードは6文字以上で設定してください', 'error');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const supabase = await getSupabase();
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { nickname },
+                },
+            });
+            if (error) {
+                showMessage(error.message || '登録に失敗しました', 'error');
+            } else {
+                showMessage('登録が完了しました! 確認メールをご確認ください。', 'success');
+                setTimeout(() => {
+                    setCurrentPage('login');
+                    setPassword('');
+                    setConfirmPassword('');
+                    setNickname('');
+                }, 2000);
+            }
+        } catch (error) {
+            showMessage('登録中にエラーが発生しました', 'error');
+            console.error('Registration error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            showMessage('メールアドレスを入力してください', 'error');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const supabase = await getSupabase();
+            const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+            if (error) {
+                showMessage(error.message || 'メール送信に失敗しました', 'error');
+            } else {
+                showMessage('パスワードリセットのメールを送信しました', 'success');
+            }
+        } catch (error) {
+            showMessage('メール送信中にエラーが発生しました', 'error');
+            console.error('Password reset error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleKeyPress = (e, action) => {
+        if (e.key === 'Enter' && !loading) {
+            action();
+        }
+    };
+
+    const getMessageStyles = () => {
+        switch (messageType) {
+            case 'success':
+                return 'bg-green-50 text-green-700 border border-green-200';
+            case 'error':
+                return 'bg-red-50 text-red-700 border border-red-200';
+            default:
+                return 'bg-blue-50 text-blue-700 border border-blue-200';
+        }
+    };
+
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
-        >
-          設定を開く
-        </button>
-      </div>
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <header className="bg-white shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-pink-500">学びリンク</h1>
+                    <div className="flex gap-4">
+                        {currentPage !== 'login' && (
+                            <button
+                                onClick={() => {
+                                    setCurrentPage('login');
+                                    setMessage('');
+                                }}
+                                className="text-gray-600 hover:text-gray-800"
+                            >
+                                ログイン
+                            </button>
+                        )}
+                        {currentPage !== 'register' && (
+                            <button
+                                onClick={() => {
+                                    setCurrentPage('register');
+                                    setMessage('');
+                                }}
+                                className="text-pink-500 hover:text-pink-600"
+                            >
+                                登録
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <div className="max-w-md mx-auto mt-16 px-4">
+                {/* Login Page */}
+                {currentPage === 'login' && (
+                    <div className="bg-white rounded-lg shadow-md p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">ログイン</h2>
+
+                        <div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">メールアドレス</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleLogin)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="example@email.com"
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">パスワード</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleLogin)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="パスワードを入力"
+                                />
+                            </div>
+
+                            {message && (
+                                <div className={`mb-4 p-3 rounded-md text-sm ${getMessageStyles()}`}>
+                                    {message}
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handleLogin}
+                                disabled={loading}
+                                className="w-full bg-pink-500 text-white py-3 rounded-md font-semibold hover:bg-pink-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                                {loading ? '処理中...' : 'ログイン'}
+                            </button>
+                        </div>
+
+                        <div className="mt-6 text-center">
+                            <button
+                                onClick={() => {
+                                    setCurrentPage('forgot');
+                                    setMessage('');
+                                }}
+                                disabled={loading}
+                                className="text-pink-500 hover:text-pink-600 text-sm disabled:text-gray-400"
+                            >
+                                パスワードをお忘れの方はこちら
+                            </button>
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <span className="text-gray-600 text-sm">アカウントをお持ちでない方は </span>
+                            <button
+                                onClick={() => {
+                                    setCurrentPage('register');
+                                    setMessage('');
+                                }}
+                                disabled={loading}
+                                className="text-pink-500 hover:text-pink-600 text-sm font-semibold disabled:text-gray-400"
+                            >
+                                新規登録
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Register Page */}
+                {currentPage === 'register' && (
+                    <div className="bg-white rounded-lg shadow-md p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">新規登録</h2>
+
+                        <div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">ニックネーム</label>
+                                <input
+                                    type="text"
+                                    value={nickname}
+                                    onChange={(e) => setNickname(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleRegister)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="ニックネームを入力"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">メールアドレス</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleRegister)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="example@email.com"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-700 mb-2">パスワード</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleRegister)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="6文字以上で入力"
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">パスワード(確認用)</label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleRegister)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="パスワードを再入力"
+                                />
+                            </div>
+
+                            <div className="mb-6 text-sm text-gray-600">
+                                登録することで、<span className="text-pink-500">プライバシーポリシー</span>に同意したものとみなされます。
+                            </div>
+
+                            {message && (
+                                <div className={`mb-4 p-3 rounded-md text-sm ${getMessageStyles()}`}>
+                                    {message}
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handleRegister}
+                                disabled={loading}
+                                className="w-full bg-pink-500 text-white py-3 rounded-md font-semibold hover:bg-pink-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                                {loading ? '処理中...' : '登録する'}
+                            </button>
+                        </div>
+
+                        <div className="mt-6 text-center">
+                            <span className="text-gray-600 text-sm">すでにアカウントをお持ちの場合は </span>
+                            <button
+                                onClick={() => {
+                                    setCurrentPage('login');
+                                    setMessage('');
+                                }}
+                                disabled={loading}
+                                className="text-pink-500 hover:text-pink-600 text-sm font-semibold disabled:text-gray-400"
+                            >
+                                ログイン
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Forgot Password Page */}
+                {currentPage === 'forgot' && (
+                    <div className="bg-white rounded-lg shadow-md p-8">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">パスワードをお忘れの方</h2>
+
+                        <p className="text-gray-600 mb-6">
+                            登録されたメールアドレスを入力してください。パスワードリセット用のリンクをお送りします。
+                        </p>
+
+                        <div>
+                            <div className="mb-6">
+                                <label className="block text-gray-700 mb-2">メールアドレス</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onKeyPress={(e) => handleKeyPress(e, handleForgotPassword)}
+                                    disabled={loading}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:bg-gray-100"
+                                    placeholder="example@email.com"
+                                />
+                            </div>
+
+                            {message && (
+                                <div className={`mb-4 p-3 rounded-md text-sm ${getMessageStyles()}`}>
+                                    {message}
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handleForgotPassword}
+                                disabled={loading}
+                                className="w-full bg-pink-500 text-white py-3 rounded-md font-semibold hover:bg-pink-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                                {loading ? '送信中...' : '送信する'}
+                            </button>
+                        </div>
+
+                        <div className="mt-6 text-center">
+                            <button
+                                onClick={() => {
+                                    setCurrentPage('login');
+                                    setMessage('');
+                                }}
+                                disabled={loading}
+                                className="text-pink-500 hover:text-pink-600 text-sm disabled:text-gray-400"
+                            >
+                                ログイン画面に戻る
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
     );
-  }
-
-  return (
-    <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 ${fontSizeClass[fontSize]}`}>
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        
-        {/* メインメニュー */}
-        {currentScreen === 'menu' && (
-          <>
-            {/* ヘッダー */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-800">設定</h2>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="閉じる"
-              >
-                <X className="w-6 h-6 text-gray-600" />
-              </button>
-            </div>
-
-            {/* メニュー項目 */}
-            <div className="p-6 space-y-1">
-              {/* パスワード再設定 */}
-              <button
-                onClick={() => setCurrentScreen('password')}
-                className="w-full text-left py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                <div className="font-bold text-gray-800 mb-1">パスワード再設定</div>
-                <div className="text-sm text-gray-400">パスワードを変更します</div>
-              </button>
-
-              {/* メールアドレス再設定 */}
-              <button
-                onClick={() => setCurrentScreen('email')}
-                className="w-full text-left py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                <div className="font-bold text-gray-800 mb-1">メールアドレス再設定</div>
-                <div className="text-sm text-gray-400">メールアドレスを変更します</div>
-              </button>
-
-              {/* 文字の大きさ */}
-              <div className="py-4 border-b border-gray-100">
-                <div className="font-bold text-gray-800 mb-3">文字の大きさ</div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setFontSize('small')}
-                    className={`flex-1 py-3 rounded-lg border-2 font-medium transition-colors ${
-                      fontSize === 'small'
-                        ? 'bg-pink-500 text-white border-pink-500'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    小
-                  </button>
-                  <button
-                    onClick={() => setFontSize('medium')}
-                    className={`flex-1 py-3 rounded-lg border-2 font-medium transition-colors ${
-                      fontSize === 'medium'
-                        ? 'bg-pink-500 text-white border-pink-500'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    中
-                  </button>
-                  <button
-                    onClick={() => setFontSize('large')}
-                    className={`flex-1 py-3 rounded-lg border-2 font-medium transition-colors ${
-                      fontSize === 'large'
-                        ? 'bg-pink-500 text-white border-pink-500'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    大
-                  </button>
-                </div>
-              </div>
-
-              {/* 利用規約 */}
-              <button
-                onClick={() => setCurrentScreen('terms')}
-                className="w-full text-left py-4 hover:bg-gray-50 transition-colors"
-              >
-                <div className="font-bold text-gray-800 mb-1">利用規約</div>
-                <div className="text-sm text-gray-400">利用規約を確認します</div>
-              </button>
-            </div>
-
-            {/* ログアウトボタン */}
-            <div className="p-6 pt-0">
-              <button
-                onClick={handleLogout}
-                className="w-full py-4 rounded-lg bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors"
-              >
-                ログアウト
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* パスワード再設定画面 */}
-        {currentScreen === 'password' && (
-          <>
-            {/* ヘッダー */}
-            <div className="flex items-center gap-3 p-6 border-b border-gray-200">
-              <button
-                onClick={() => setCurrentScreen('menu')}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="戻る"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
-              </button>
-              <h2 className="text-2xl font-bold text-gray-800">パスワード再設定</h2>
-            </div>
-
-            {/* フォーム */}
-            <div className="p-6">
-              <div className="space-y-5">
-                {/* 現在のパスワード */}
-                <div>
-                  <label className="block font-medium text-gray-700 mb-2">
-                    現在のパスワード
-                  </label>
-                  <input
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="現在のパスワードを入力"
-                  />
-                </div>
-
-                {/* 新しいパスワード */}
-                <div>
-                  <label className="block font-medium text-gray-700 mb-2">
-                    新しいパスワード
-                  </label>
-                  <input
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="新しいパスワードを入力"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    8文字以上、英数字を含むパスワードを設定してください
-                  </p>
-                </div>
-
-                {/* 新しいパスワード（確認） */}
-                <div>
-                  <label className="block font-medium text-gray-700 mb-2">
-                    新しいパスワード（確認）
-                  </label>
-                  <input
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="新しいパスワードを再入力"
-                  />
-                </div>
-              </div>
-
-              {/* ボタン */}
-              <div className="mt-8 space-y-3">
-                <button
-                  onClick={handlePasswordSubmit}
-                  className="w-full py-4 rounded-lg bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors"
-                >
-                  パスワードを変更
-                </button>
-                <button
-                  onClick={() => setCurrentScreen('menu')}
-                  className="w-full py-4 rounded-lg border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
-                >
-                  キャンセル
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* メールアドレス再設定画面 */}
-        {currentScreen === 'email' && (
-          <>
-            {/* ヘッダー */}
-            <div className="flex items-center gap-3 p-6 border-b border-gray-200">
-              <button
-                onClick={() => setCurrentScreen('menu')}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="戻る"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
-              </button>
-              <h2 className="text-2xl font-bold text-gray-800">メールアドレス再設定</h2>
-            </div>
-
-            {/* フォーム */}
-            <div className="p-6">
-              <div className="space-y-5">
-                {/* 現在のメールアドレス */}
-                <div>
-                  <label className="block font-medium text-gray-700 mb-2">
-                    現在のメールアドレス
-                  </label>
-                  <input
-                    type="email"
-                    value={emailData.currentEmail}
-                    onChange={(e) => setEmailData({...emailData, currentEmail: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="example@email.com"
-                  />
-                </div>
-
-                {/* 新しいメールアドレス */}
-                <div>
-                  <label className="block font-medium text-gray-700 mb-2">
-                    新しいメールアドレス
-                  </label>
-                  <input
-                    type="email"
-                    value={emailData.newEmail}
-                    onChange={(e) => setEmailData({...emailData, newEmail: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="new@email.com"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    確認メールが新しいアドレスに送信されます
-                  </p>
-                </div>
-
-                {/* パスワード確認 */}
-                <div>
-                  <label className="block font-medium text-gray-700 mb-2">
-                    パスワード
-                  </label>
-                  <input
-                    type="password"
-                    value={emailData.password}
-                    onChange={(e) => setEmailData({...emailData, password: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    placeholder="パスワードを入力"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    本人確認のため、現在のパスワードを入力してください
-                  </p>
-                </div>
-              </div>
-
-              {/* ボタン */}
-              <div className="mt-8 space-y-3">
-                <button
-                  onClick={handleEmailSubmit}
-                  className="w-full py-4 rounded-lg bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors"
-                >
-                  メールアドレスを変更
-                </button>
-                <button
-                  onClick={() => setCurrentScreen('menu')}
-                  className="w-full py-4 rounded-lg border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
-                >
-                  キャンセル
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* 利用規約画面 */}
-        {currentScreen === 'terms' && (
-          <>
-            {/* ヘッダー */}
-            <div className="flex items-center gap-3 p-6 border-b border-gray-200">
-              <button
-                onClick={() => setCurrentScreen('menu')}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="戻る"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
-              </button>
-              <h2 className="text-2xl font-bold text-gray-800">利用規約</h2>
-            </div>
-
-            {/* 規約内容 */}
-            <div className="p-6">
-              <div className="bg-gray-50 rounded-lg p-6 max-h-96 overflow-y-auto">
-                <h3 className="font-bold text-lg mb-4">学びリンク 利用規約</h3>
-                
-                <div className="space-y-4 text-sm text-gray-700">
-                  <section>
-                    <h4 className="font-bold mb-2">第1条（適用）</h4>
-                    <p>本規約は、本サービスの提供条件及び本サービスの利用に関する当社と登録ユーザーとの間の権利義務関係を定めることを目的とし、登録ユーザーと当社との間の本サービスの利用に関わる一切の関係に適用されます。</p>
-                  </section>
-
-                  <section>
-                    <h4 className="font-bold mb-2">第2条（利用登録）</h4>
-                    <p>登録希望者が当社の定める方法によって利用登録を申請し、当社がこれを承認することによって、利用登録が完了するものとします。</p>
-                  </section>
-
-                  <section>
-                    <h4 className="font-bold mb-2">第3条（禁止事項）</h4>
-                    <p>登録ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません。</p>
-                    <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
-                      <li>法令または公序良俗に違反する行為</li>
-                      <li>犯罪行為に関連する行為</li>
-                      <li>当社のサーバーまたはネットワークの機能を破壊したり、妨害したりする行為</li>
-                      <li>当社のサービスの運営を妨害するおそれのある行為</li>
-                      <li>他のユーザーに関する個人情報等を収集または蓄積する行為</li>
-                    </ul>
-                  </section>
-
-                  <section>
-                    <h4 className="font-bold mb-2">第4条（本サービスの提供の停止等）</h4>
-                    <p>当社は、以下のいずれかの事由があると判断した場合、登録ユーザーに事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。</p>
-                  </section>
-
-                  <section>
-                    <h4 className="font-bold mb-2">第5条（著作権）</h4>
-                    <p>本サービスに関する著作権は、当社または正当な権利を有する第三者に帰属します。</p>
-                  </section>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setCurrentScreen('menu')}
-                className="w-full mt-6 py-4 rounded-lg border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
-              >
-                閉じる
-              </button>
-            </div>
-          </>
-        )}
-
-      </div>
-    </div>
-  );
 }

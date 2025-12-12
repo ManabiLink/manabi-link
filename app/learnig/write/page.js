@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 const HIRAGANA_ROWS = {
   'あ段': ['あ','い','う','え','お'],
@@ -161,6 +162,7 @@ export default function WritePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 to-pink-100 p-8">
       <div className="container bg-white rounded-3xl p-8 shadow-2xl w-full max-w-4xl text-center">
+        <Link href="/learnig" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← 学習ページに戻る</Link>
         <h1 className="text-3xl font-bold text-indigo-600 mb-6">🌈 もじの おけいこ 🌈</h1>
 
         <div className="selection-buttons mb-4 flex justify-center gap-4">

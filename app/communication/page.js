@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const categories = {
@@ -100,7 +100,7 @@ export default function Page(){
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {/* ヘッダー */}
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <div className="bg-white rounded-2xl shadow p-6 mb-6">
         <div className="flex justify-between items-start">
           <div>

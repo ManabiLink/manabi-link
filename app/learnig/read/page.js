@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 const STORIES = {
   momotaro: {
@@ -93,8 +94,10 @@ export default function ReadPage() {
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-purple-500 to-indigo-700 flex items-start justify-center">
-      <div className="max-w-3xl w-full bg-white rounded-2xl p-8 shadow-2xl">
-        <h1 className="text-2xl text-center text-indigo-600 mb-6">📚 読み聞かせページ 📖</h1>
+      <div className="max-w-3xl w-full">
+        <Link href="/learnig" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← 学習ページに戻る</Link>
+        <div className="bg-white rounded-2xl p-8 shadow-2xl">
+          <h1 className="text-2xl text-center text-indigo-600 mb-6">📚 読み聞かせページ 📖</h1>
 
         <div className="mb-4">
           <select className="w-full p-3 border rounded-lg" value={storyKey} onChange={(e)=>setStoryKey(e.target.value)}>

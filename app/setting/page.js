@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 export default function Page(){
   const [page, setPage] = useState('settings');
@@ -31,6 +32,7 @@ export default function Page(){
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       {page === 'settings' && (
         <div className="container-box settings page bg-white p-6 rounded shadow">
           <h2 className="text-xl font-semibold mb-4">設定</h2>

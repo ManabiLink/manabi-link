@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 
 const HOLIDAYS = {
   "2025-01-01": "元日", "2025-01-13": "成人の日", "2025-02-11": "建国記念の日",
@@ -96,7 +97,8 @@ export default function Page(){
   }, [year, month]);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto">
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <h1 className="text-2xl font-bold text-pink-600 mb-4">ピンクカレンダー 💖</h1>
       <div className="flex gap-3 mb-4">
         <button className={`px-3 py-2 rounded ${mode==='normal'?'bg-pink-500 text-white':''}`} onClick={()=>{setMode('normal'); setEditorVisible(false);}}>📅 通常カレンダー</button>

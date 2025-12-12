@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ContactPage() {
   const [title, setTitle] = useState('');
@@ -33,6 +34,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-pink-50 to-white py-12">
+      <Link href="/" className="absolute top-6 left-6 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-pink-600 text-center mb-6">きゅるん♡お問い合わせ</h1>
         <form onSubmit={handleSubmit}>

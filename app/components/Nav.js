@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getSupabase } from '@/lib/getSupabase';
+import { supabase } from '@/app/lib/supabase';
 
 export default function Nav(){
   const [user, setUser] = useState(null);
@@ -12,7 +12,7 @@ export default function Nav(){
     let mounted = true;
     (async () => {
       try {
-        const sb = await getSupabase();
+        const sb = await supabase();
         if (!mounted) return;
         setSupabase(sb);
         const { data: { session } = {} } = await sb.auth.getSession().catch(()=>({}));

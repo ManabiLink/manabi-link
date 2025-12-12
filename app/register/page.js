@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { getSupabase } from '@/lib/getSupabase';
+import { supabase } from '@/app/lib/Supabase';
 
 export default function Page(){
   const [nickname, setNickname] = useState('');
@@ -24,7 +24,7 @@ export default function Page(){
     if (password !== passwordConfirm) { setError('パスワードが一致しません'); return; }
     setLoading(true);
     try{
-      const supabase = await getSupabase();
+      const supabase = await supabase();
       const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { display_name: nickname } } });
       if (error) throw error;
       alert('登録完了！メールを確認して認証を完了してください。その後ログイン画面に移動してください。');

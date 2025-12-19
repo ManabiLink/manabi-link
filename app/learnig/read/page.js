@@ -67,7 +67,7 @@ export default function ReadPage() {
           <div className="text-center text-blue-700 bg-blue-50 p-3 rounded">
             準備完了
           </div>
-        </div> {/* ← ★ これが抜けてた */}
+        </div>
       </div>
     </div>
   );

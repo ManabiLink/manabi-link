@@ -20,11 +20,11 @@ export default function Page(){
   const [events, setEvents] = useState({});
   const [meds, setMeds] = useState({});
 
-  // load persisted data after mount to avoid hydration mismatch
   useEffect(() => {
-    try { setEvents(JSON.parse(localStorage.getItem('events')||'{}')); } catch(e) { setEvents({}); }
-    try { setMeds(JSON.parse(localStorage.getItem('meds')||'{}')); } catch(e) { setMeds({}); }
+    try { setEvents(JSON.parse(localStorage.getItem('events')||'{}')); } catch {}
+    try { setMeds(JSON.parse(localStorage.getItem('meds')||'{}')); } catch {}
   }, []);
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [mode, setMode] = useState('normal');
   const [editorVisible, setEditorVisible] = useState(false);
@@ -38,36 +38,40 @@ export default function Page(){
   useEffect(()=>{
     if ('Notification' in window) Notification.requestPermission();
     const t = setInterval(()=>{
-      checkAndNotify(events); checkAndNotify(meds);
+      checkAndNotify(events);
+      checkAndNotify(meds);
     }, 60000);
     return ()=>clearInterval(t);
   }, [events, meds]);
 
   function checkAndNotify(dataset){
-    const nowMin = new Date();
-    const nowStr = nowMin.toISOString().slice(0,16);
-    for (const [d, ev] of Object.entries(dataset)){
-      if (ev.notify && ev.notify === nowStr){
-        if (Notification.permission === 'granted') new Notification(ev.title || '予定', { body: ev.body || '通知です💖' });
+    const nowStr = new Date().toISOString().slice(0,16);
+    for (const ev of Object.values(dataset)){
+      if (ev.notify === nowStr && Notification.permission === 'granted'){
+        new Notification(ev.title || '予定', { body: ev.body || '通知です💖' });
       }
     }
   }
 
   function openEditorFor(date){
     setSelectedDate(date);
-    const setObj = mode === 'normal' ? events : meds;
-    const data = setObj[date] || {};
-    setTitle(data.title||''); setBody(data.body||''); setNotify(data.notify||'');
+    const data = (mode === 'normal' ? events : meds)[date] || {};
+    setTitle(data.title || '');
+    setBody(data.body || '');
+    setNotify(data.notify || '');
     setEditorVisible(true);
   }
 
   function save(){
     if (!selectedDate) return;
-    if (notify && notify < new Date().toISOString().slice(0,16)) return alert('通知日時は現在以降に設定してください💖');
+    if (notify && notify < new Date().toISOString().slice(0,16)){
+      alert('通知日時は現在以降に設定してください💖');
+      return;
+    }
     if (mode === 'normal'){
-      const o = {...events, [selectedDate]: { title, body, notify }}; setEvents(o);
+      setEvents({...events, [selectedDate]: { title, body, notify }});
     } else {
-      const o = {...meds, [selectedDate]: { title, body, notify }}; setMeds(o);
+      setMeds({...meds, [selectedDate]: { title, body, notify }});
     }
     setEditorVisible(false);
   }
@@ -90,49 +94,89 @@ export default function Page(){
     for (let i=0;i<firstDay;i++) row.push(null);
     for (let d=1; d<=daysInMonth; d++){
       row.push(d);
-      if (row.length===7){ rows.push(row); row = []; }
+      if (row.length === 7){ rows.push(row); row = []; }
     }
-    if (row.length) { while(row.length<7) row.push(null); rows.push(row); }
+    while (row.length < 7) row.push(null);
+    if (row.length) rows.push(row);
     return rows;
   }, [year, month]);
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600 transition">← ホームに戻る</Link>
-      <h1 className="text-2xl font-bold text-pink-600 mb-4">ピンクカレンダー 💖</h1>
+      <Link href="/" className="inline-block mb-4 px-4 py-2 text-white bg-pink-500 rounded-lg hover:bg-pink-600">
+        ← ホームに戻る
+      </Link>
+
+      <h1 className="text-2xl font-bold text-pink-600 mb-4">成長日記💖</h1>
+
       <div className="flex gap-3 mb-4">
-        <button className={`px-3 py-2 rounded ${mode==='normal'?'bg-pink-500 text-white':''}`} onClick={()=>{setMode('normal'); setEditorVisible(false);}}>📅 通常カレンダー</button>
-        <button className={`px-3 py-2 rounded ${mode==='med'?'bg-pink-500 text-white':''}`} onClick={()=>{setMode('med'); setEditorVisible(false);}}>💊 お薬手帳</button>
+        <button
+          className={`px-3 py-2 rounded ${mode==='normal'?'bg-pink-500 text-white':''}`}
+          onClick={()=>{setMode('normal'); setEditorVisible(false);}}
+        >
+          📅 通常カレンダー
+        </button>
+        <button
+          className={`px-3 py-2 rounded ${mode==='med'?'bg-pink-500 text-white':''}`}
+          onClick={()=>{setMode('med'); setEditorVisible(false);}}
+        >
+          💊 お薬手帳
+        </button>
       </div>
 
       <div className="bg-white rounded shadow p-4">
         <div className="flex gap-3 justify-center mb-3">
-          <select value={year} onChange={e=>setYear(Number(e.target.value))} className="border px-2 py-1">
+          <select value={year} onChange={e=>setYear(+e.target.value)} className="border px-2 py-1">
             {Array.from({length:11}).map((_,i)=>{
-              const y=2020+i; return <option key={y} value={y}>{y}</option>;
+              const y = 2020+i;
+              return <option key={y} value={y}>{y}</option>;
             })}
           </select>
-          <select value={month} onChange={e=>setMonth(Number(e.target.value))} className="border px-2 py-1">
-            {Array.from({length:12}).map((_,i)=>{ const m=i+1; return <option key={m} value={m}>{m}</option>; })}
+          <select value={month} onChange={e=>setMonth(+e.target.value)} className="border px-2 py-1">
+            {Array.from({length:12}).map((_,i)=>{
+              const m = i+1;
+              return <option key={m} value={m}>{m}</option>;
+            })}
           </select>
         </div>
+
         <table className="w-full table-fixed border-collapse">
           <thead>
-            <tr className="text-pink-600"><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
+            <tr className="text-pink-600">
+              {['日','月','火','水','木','金','土'].map(d=>(
+                <th key={d} className="text-right p-2">{d}</th>
+              ))}
+            </tr>
           </thead>
+
           <tbody>
-            {calendar.map((r,ri)=> (
+            {calendar.map((row, ri)=>(
               <tr key={ri}>
-                {r.map((d,ci)=>{
-                  if (d==null) return <td key={ci}></td>;
+                {row.map((d, ci)=>{
+                  if (!d) return <td key={ci}></td>;
                   const ymd = `${year}-${pad(month)}-${pad(d)}`;
                   const dataSet = mode==='normal' ? events : meds;
                   const has = dataSet[ymd];
                   const isHoliday = mode==='normal' && HOLIDAYS[ymd];
+
                   return (
-                    <td key={ci} className={`align-top p-2 ${isHoliday? 'text-red-500':''}`} onClick={()=>openEditorFor(ymd)}>
-                      <div><strong>{d}</strong>{isHoliday? <div className="text-xs">{HOLIDAYS[ymd]}</div>:null}</div>
-                      {has && <div className="mt-2 bg-pink-200 text-white rounded px-2 py-1 text-xs">{has.title}</div>}
+                    <td
+                      key={ci}
+                      className={`align-top p-2 cursor-pointer ${isHoliday?'text-red-500':''}`}
+                      onClick={()=>openEditorFor(ymd)}
+                    >
+                      <div className="text-right">
+                        <strong>{d}</strong>
+                        {isHoliday && (
+                          <div className="text-xs">{HOLIDAYS[ymd]}</div>
+                        )}
+                      </div>
+
+                      {has && (
+                        <div className="mt-2 bg-pink-200 text-white rounded px-2 py-1 text-xs text-right">
+                          {has.title}
+                        </div>
+                      )}
                     </td>
                   );
                 })}
@@ -142,20 +186,37 @@ export default function Page(){
         </table>
       </div>
 
-      {editorVisible ? (
+      {editorVisible && (
         <div className="bg-white rounded shadow p-4 mt-4">
-          <h3 className="font-semibold">{selectedDate}</h3>
-          <input className="w-full border p-2 mb-2" value={title} onChange={e=>setTitle(e.target.value)} placeholder="タイトル" />
-          <textarea className="w-full border p-2 mb-2" value={body} onChange={e=>setBody(e.target.value)} placeholder="内容" rows={4} />
-          <label className="block mb-2">通知日時：</label>
-          <input type="datetime-local" className="border p-2 mb-3" value={notify} onChange={e=>setNotify(e.target.value)} min={new Date().toISOString().slice(0,16)} />
+          <h3 className="font-semibold mb-2">{selectedDate}</h3>
+          <input
+            className="w-full border p-2 mb-2"
+            value={title}
+            onChange={e=>setTitle(e.target.value)}
+            placeholder="タイトル"
+          />
+          <textarea
+            className="w-full border p-2 mb-2"
+            value={body}
+            onChange={e=>setBody(e.target.value)}
+            placeholder="内容"
+            rows={4}
+          />
+          <label className="block mb-1">通知日時：</label>
+          <input
+            type="datetime-local"
+            className="border p-2 mb-3"
+            value={notify}
+            onChange={e=>setNotify(e.target.value)}
+            min={new Date().toISOString().slice(0,16)}
+          />
           <div className="flex gap-3">
             <button className="bg-pink-500 text-white px-4 py-2 rounded" onClick={save}>保存</button>
             <button className="px-4 py-2 border rounded" onClick={remove}>削除</button>
             <button className="px-4 py-2 border rounded" onClick={()=>setEditorVisible(false)}>閉じる</button>
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

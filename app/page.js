@@ -11,6 +11,8 @@ export default function Home() {
           <a href="/learnig" className="block p-6 bg-pink-50 rounded-lg shadow">学習ページ</a>
           <a href="/article" className="block p-6 bg-yellow-50 rounded-lg shadow">記事一覧</a>
           <a href="/communication" className="block p-6 bg-green-50 rounded-lg shadow">掲示板</a>
+          <a href="/setting" className="block p-6 bg-blue-50 rounded-lg shadow">設定ページ</a>
+          <a href="/carendar" className="block p-6 bg-purple-50 rounded-lg shadow">カレンダー</a>
         </section>
       </div>
     </main>
